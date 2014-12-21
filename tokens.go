@@ -1,60 +1,6 @@
 package main
 
-type Token int
-
-const (
-	tInvalid Token = iota
-
-	tLiteral
-
-	tAND
-	tARRAY
-	tASSIGN
-	tBEGIN
-	tBOOLEAN
-	tBREAK
-	tCHAR
-	tCONTINUE
-	tDIV
-	tDO
-	tDOTDOT
-	tDOWNTO
-	tELSE
-	tEND
-	tFALSE
-	tFNUMBER
-	tFOR
-	tFUNCTION
-	tGE
-	tGOTO
-	tID
-	tIF
-	tINTEGER
-	tLE
-	tMOD
-	tNE
-	tNOT
-	tNUMBER
-	tOF
-	tOR
-	tPROCEDURE
-	tPROGRAM
-	tQSTRING
-	tREAL
-	tRECORD
-	tREPEAT
-	tSTRING
-	tTHEN
-	tTHIS
-	tTO
-	tTRUE
-	tTYPE
-	tUNTIL
-	tVAR
-	tWHILE
-)
-
-var reserved = map[string]Token{
+var reserved = map[string]int{
 	"and":       tAND,
 	"array":     tARRAY,
 	"begin":     tBEGIN,
@@ -90,10 +36,4 @@ var reserved = map[string]Token{
 	"until":     tUNTIL,
 	"var":       tVAR,
 	"while":     tWHILE,
-}
-
-type Lexeme struct {
-	T Token
-	S string
-	L int
 }

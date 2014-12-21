@@ -3,13 +3,15 @@
 package main
 
 import (
+	"fmt"
 	"bytes"
+	"strconv"
 )
 
 
-//line lexer.rl:8
+//line lexer.rl:10
 
-//line lexer.go:13
+//line lexer.go:15
 var _scanner_actions []byte = []byte{
 	0, 1, 0, 1, 1, 1, 2, 1, 3, 
 	1, 4, 1, 5, 1, 6, 1, 7, 
@@ -91,9 +93,14 @@ const scanner_error int = 0
 const scanner_en_main int = 4
 
 
-//line lexer.rl:9
+//line lexer.rl:11
 
-func lex(data []byte) []Lexeme {
+type tok struct {
+    t int
+    yy yySymType
+}
+
+func lex(data []byte) []tok {
 
 	cs, p, pe, eof := 0, 0, len(data), len(data)
 	ts, te, act := 0, 0, 0
@@ -102,14 +109,26 @@ func lex(data []byte) []Lexeme {
 
 	lineno := 1
 
-	var tokens []Lexeme
+	var tokens []tok
 
-	add := func(t Token) {
-		tokens = append(tokens, Lexeme{t, string(data[ts:te]), lineno})
+	add := func(t int) {
+	    tokens = append(tokens, tok{t:t})
+	}
+
+	addstr := func(t int, s string) {
+	    tokens = append(tokens, tok{t:t, yy:yySymType{s:s}})
+	}
+
+	addint := func(t int, i int) {
+	    tokens = append(tokens, tok{t:t, yy:yySymType{i:i}})
+	}
+
+	addf := func(t int, f float64) {
+	    tokens = append(tokens, tok{t:t, yy:yySymType{f:f}})
 	}
 
 	
-//line lexer.go:113
+//line lexer.go:132
 	{
 	cs = scanner_start
 	ts = 0
@@ -117,7 +136,7 @@ func lex(data []byte) []Lexeme {
 	act = 0
 	}
 
-//line lexer.go:121
+//line lexer.go:140
 	{
 	var _klen int
 	var _trans int
@@ -140,7 +159,7 @@ _resume:
 //line NONE:1
 ts = p
 
-//line lexer.go:144
+//line lexer.go:163
 		}
 	}
 
@@ -214,62 +233,68 @@ _eof_trans:
 te = p+1
 
 		case 3:
-//line lexer.rl:28
+//line lexer.rl:47
 te = p+1
-{ add(tLiteral) }
+{ add(int(data[ts])) }
 		case 4:
-//line lexer.rl:29
+//line lexer.rl:48
 te = p+1
 { add(tASSIGN) }
 		case 5:
-//line lexer.rl:30
+//line lexer.rl:49
 te = p+1
 { add(tDOTDOT) }
 		case 6:
-//line lexer.rl:31
+//line lexer.rl:50
 te = p+1
 { add(tGE) }
 		case 7:
-//line lexer.rl:32
+//line lexer.rl:51
 te = p+1
 { add(tLE) }
 		case 8:
-//line lexer.rl:33
+//line lexer.rl:52
 te = p+1
 { add(tNE) }
 		case 9:
-//line lexer.rl:34
+//line lexer.rl:53
 te = p+1
 { add(tQSTRING) }
 		case 10:
-//line lexer.rl:35
+//line lexer.rl:54
 te = p+1
 { lineno += bytes.Count(data[ts:te], []byte{'\n'}) }
 		case 11:
-//line lexer.rl:36
+//line lexer.rl:55
 te = p+1
 { }
 		case 12:
-//line lexer.rl:37
+//line lexer.rl:56
 te = p+1
 { lineno++ }
 		case 13:
-//line lexer.rl:28
+//line lexer.rl:47
 te = p
 p--
-{ add(tLiteral) }
+{ add(int(data[ts])) }
 		case 14:
-//line lexer.rl:38
+//line lexer.rl:57
 te = p
 p--
-{ add(tFNUMBER) }
+{
+		    f, _ := strconv.ParseFloat(string(data[ts:te]), 64)
+		    addf(tFNUMBER, f)
+		}
 		case 15:
-//line lexer.rl:39
+//line lexer.rl:61
 te = p
 p--
-{ add(tNUMBER) }
+{
+		    i, _ := strconv.Atoi(string(data[ts:te]))
+		    addint(tNUMBER, i)
+		}
 		case 16:
-//line lexer.rl:40
+//line lexer.rl:65
 te = p
 p--
 {
@@ -277,17 +302,20 @@ p--
 			if !ok {
 				t = tID
 			};
-			add(t)
+			addstr(t, string(data[ts:te]))
 		}
 		case 17:
-//line lexer.rl:28
+//line lexer.rl:47
 p = (te) - 1
-{ add(tLiteral) }
+{ add(int(data[ts])) }
 		case 18:
-//line lexer.rl:39
+//line lexer.rl:61
 p = (te) - 1
-{ add(tNUMBER) }
-//line lexer.go:291
+{
+		    i, _ := strconv.Atoi(string(data[ts:te]))
+		    addint(tNUMBER, i)
+		}
+//line lexer.go:319
 		}
 	}
 
@@ -301,7 +329,7 @@ _again:
 //line NONE:1
 ts = 0
 
-//line lexer.go:305
+//line lexer.go:333
 		}
 	}
 
@@ -323,8 +351,24 @@ ts = 0
 	_out: {}
 	}
 
-//line lexer.rl:51
+//line lexer.rl:76
 
 
 	return tokens
+}
+
+type pascalLexer []tok
+
+func (p *pascalLexer) Lex(lval *yySymType) int  {
+    if len(*p) == 0 {
+	    return 0
+    }
+    t := (*p)[0]
+    *p = (*p)[1:]
+    *lval = t.yy
+    return t.t
+}
+
+func (p *pascalLexer) Error(s string) {
+    fmt.Println("syntax error:", s)
 }
