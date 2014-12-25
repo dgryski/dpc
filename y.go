@@ -4,12 +4,18 @@ package main
 import __yyfmt__ "fmt"
 
 //line parser.y:3
-//line parser.y:7
+import "log"
+
+//line parser.y:9
 type yySymType struct {
 	yys int
 	f   float64
 	i   int
 	s   string
+
+	vars    []pVar
+	strings []string
+	ptyp    pType
 }
 
 const tFNUMBER = 57346
@@ -256,15 +262,15 @@ var yyPact = []int{
 }
 var yyPgo = []int{
 
-	0, 168, 123, 167, 108, 4, 2, 1, 9, 6,
-	166, 164, 3, 162, 122, 16, 15, 0, 5,
+	0, 4, 1, 2, 3, 9, 168, 123, 167, 108,
+	6, 166, 164, 162, 122, 16, 15, 0, 5,
 }
 var yyR1 = []int{
 
-	0, 1, 5, 5, 2, 2, 2, 6, 6, 6,
-	6, 6, 6, 6, 7, 7, 7, 7, 7, 3,
-	3, 10, 11, 11, 9, 9, 8, 8, 12, 12,
-	4, 13, 13, 14, 14, 15, 15, 15, 15, 15,
+	0, 6, 1, 1, 7, 7, 7, 3, 3, 3,
+	3, 3, 3, 3, 2, 2, 2, 2, 2, 8,
+	8, 11, 12, 12, 10, 10, 5, 5, 4, 4,
+	9, 13, 13, 14, 14, 15, 15, 15, 15, 15,
 	15, 15, 15, 15, 15, 15, 18, 18, 17, 17,
 	17, 17, 17, 17, 17, 17, 17, 17, 17, 17,
 	17, 17, 17, 17, 17, 17, 17, 17, 17, 17,
@@ -283,24 +289,24 @@ var yyR2 = []int{
 }
 var yyChk = []int{
 
-	-1000, -1, 36, 6, 56, -2, -3, 46, 44, -4,
-	-10, 11, -11, 24, 35, -5, 6, 6, 57, -13,
-	-14, -15, -16, 13, 15, 6, -4, 27, 23, 47,
-	39, -2, 6, 6, 58, 59, 50, 21, -15, 56,
+	-1000, -6, 36, 6, 56, -7, -8, 46, 44, -9,
+	-11, 11, -12, 24, 35, -1, 6, 6, 57, -13,
+	-14, -15, -16, 13, 15, 6, -9, 27, 23, 47,
+	39, -7, 6, 6, 58, 59, 50, 21, -15, 56,
 	10, 60, 57, 62, 63, -17, 6, 65, 51, 52,
 	-16, 63, 32, 5, 4, 43, 22, 7, 6, -17,
-	-14, -4, -9, 63, -9, 6, -6, -7, 6, 9,
-	62, 38, 24, 35, 28, 37, 14, 12, 40, -6,
+	-14, -9, -10, 63, -10, 6, -3, -2, 6, 9,
+	62, 38, 24, 35, 28, 37, 14, 12, 40, -3,
 	56, -17, -17, 6, -18, -17, 41, 8, 16, 48,
 	50, 49, 52, 54, 53, 51, 25, 29, 30, 31,
 	34, 63, -16, 6, -17, -17, -17, -17, 10, 17,
-	45, 56, 59, -8, -12, 46, -5, 56, 56, 60,
-	-6, -8, -9, -9, 56, 61, 64, 58, -15, -17,
+	45, 56, 59, -5, -4, 46, -1, 56, 56, 60,
+	-3, -5, -10, -10, 56, 61, 64, 58, -15, -17,
 	-17, -17, -17, -17, -17, -17, -17, -17, -17, -17,
-	-17, -17, -17, -18, 64, -17, -15, -17, -7, 64,
-	56, -5, 59, 5, 56, 59, -17, 20, 64, 42,
-	56, -12, 59, -6, 18, 21, -7, -15, -17, -6,
-	5, 17, 61, -15, 33, -7,
+	-17, -17, -17, -18, 64, -17, -15, -17, -2, 64,
+	56, -1, 59, 5, 56, 59, -17, 20, 64, 42,
+	56, -4, 59, -3, 18, 21, -2, -15, -17, -3,
+	5, 17, 61, -15, 33, -2,
 }
 var yyDef = []int{
 
@@ -573,6 +579,110 @@ yydefault:
 	// dummy call; replaced with literal code
 	switch yynt {
 
+	case 2:
+		//line parser.y:41
+		{
+			yyVAL.strings = append(yyS[yypt-2].strings, yyS[yypt-0].s)
+		}
+	case 3:
+		//line parser.y:42
+		{
+			yyVAL.strings = append(yyVAL.strings, yyS[yypt-0].s)
+		}
+	case 4:
+		//line parser.y:45
+		{
+			log.Println("decl var", yyS[yypt-3].strings, yyS[yypt-1].ptyp)
+		}
+	case 5:
+		//line parser.y:46
+		{
+			log.Println("decl type", yyS[yypt-3].s, yyS[yypt-1].ptyp)
+		}
+	case 7:
+		//line parser.y:50
+		{
+			yyVAL.ptyp = yyS[yypt-0].ptyp
+		}
+	case 8:
+		//line parser.y:51
+		{
+			yyVAL.ptyp = typTypedef{name: yyS[yypt-0].s}
+		}
+	case 9:
+		//line parser.y:52
+		{
+			yyVAL.ptyp = typArray{start: yyS[yypt-5].i, end: yyS[yypt-3].i, typ: yyS[yypt-0].ptyp}
+		}
+	case 10:
+		//line parser.y:53
+		{
+			yyVAL.ptyp = typPointer{typ: yyS[yypt-0].ptyp}
+		}
+	case 11:
+		//line parser.y:54
+		{
+			yyVAL.ptyp = typRecord{fields: yyS[yypt-2].vars}
+		}
+	case 12:
+		//line parser.y:55
+		{
+			yyVAL.ptyp = typVoid{}
+		}
+	case 13:
+		//line parser.y:56
+		{
+			yyVAL.ptyp = typVoid{}
+		}
+	case 14:
+		//line parser.y:59
+		{
+			yyVAL.ptyp = typPrimitive{primInt}
+		}
+	case 15:
+		//line parser.y:60
+		{
+			yyVAL.ptyp = typPrimitive{primReal}
+		}
+	case 16:
+		//line parser.y:61
+		{
+			yyVAL.ptyp = typPrimitive{primChar}
+		}
+	case 17:
+		//line parser.y:62
+		{
+			yyVAL.ptyp = typPrimitive{primBool}
+		}
+	case 18:
+		//line parser.y:63
+		{
+			yyVAL.ptyp = typPrimitive{primString}
+		}
+	case 26:
+		//line parser.y:81
+		{
+			yyVAL.vars = append(yyS[yypt-2].vars, yyS[yypt-0].vars...)
+		}
+	case 27:
+		//line parser.y:82
+		{
+			yyVAL.vars = yyS[yypt-0].vars
+		}
+	case 28:
+		//line parser.y:85
+		{
+			for _, id := range yyS[yypt-2].strings {
+				yyVAL.vars = append(yyVAL.vars, pVar{name: id, typ: yyS[yypt-0].ptyp})
+			}
+		}
+	case 29:
+		//line parser.y:86
+		{
+			for _, id := range yyS[yypt-2].strings {
+				yyVAL.vars = append(yyVAL.vars, pVar{name: id, typ: yyS[yypt-0].ptyp})
+			}
+		}
 	}
 	goto yystack /* stack new state and value */
 }

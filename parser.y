@@ -2,12 +2,19 @@
 
 package main
 
+import "log"
+
 %}
 
 %union{
         f float64
         i int
         s string
+
+
+        vars []pVar
+        strings []string
+        ptyp pType
 }
 
 %token <f> tFNUMBER
@@ -24,33 +31,36 @@ package main
 %left '*'  '/' tAND tDIV tMOD
 %right UMINUS tNOT
 
+%type <strings> id_list
+%type <ptyp> standard_type ptype
+%type <vars> param_list param_list_list
 %%
 
 pascal_program : tPROGRAM tID ';' decls subprog_decls compound_stmt '.' ;
 
-id_list : id_list ',' tID
-        | tID
+id_list : id_list ',' tID { $$ = append($1, $3); }
+        | tID { $$ = append($$, $1) }
         ;
 
-decls: decls tVAR id_list ':' ptype ';'
-     | decls tTYPE tID '=' ptype ';'
+decls: decls tVAR id_list ':' ptype ';' { log.Println("decl var", $3, $5) }
+     | decls tTYPE tID '=' ptype ';' { log.Println("decl type", $3, $5) }
      |  /* empty */
      ;
 
-ptype: standard_type
-     | tID
-     | tARRAY '[' tNUMBER tDOTDOT tNUMBER ']' tOF standard_type
-     | '^' ptype
-     | tRECORD param_list_list ';' tEND
-     | tFUNCTION arguments ':' standard_type
-     | tPROCEDURE arguments
+ptype: standard_type { $$ = $1 }
+     | tID { $$ = typTypedef{name:$1} }
+     | tARRAY '[' tNUMBER tDOTDOT tNUMBER ']' tOF standard_type { $$ = typArray{start:$3, end:$5, typ:$8} }
+     | '^' ptype { $$ = typPointer{typ:$2} }
+     | tRECORD param_list_list ';' tEND { $$ = typRecord{fields:$2} }
+     | tFUNCTION arguments ':' standard_type { $$ = typVoid{} }
+     | tPROCEDURE arguments { $$ = typVoid{} }
      ;
 
-standard_type: tINTEGER
-             | tREAL
-             | tCHAR
-             | tBOOLEAN
-             | tSTRING
+standard_type: tINTEGER { $$ = typPrimitive{primInt} }
+             | tREAL { $$ = typPrimitive{primReal} }
+             | tCHAR { $$ = typPrimitive{primChar} }
+             | tBOOLEAN { $$ = typPrimitive{primBool} }
+             | tSTRING { $$ = typPrimitive{primString} }
              ;
 
 subprog_decls: subprog_decls subprog_decl
@@ -68,12 +78,12 @@ arguments: '(' param_list_list ')'
          | /* empty */
          ;
 
-param_list_list: param_list_list ';' param_list
-               | param_list
+param_list_list: param_list_list ';' param_list { $$ = append($1, $3...) }
+               | param_list { $$ = $1 }
                ;
 
-param_list: tVAR id_list ':' ptype
-          | id_list ':' ptype
+param_list: tVAR id_list ':' ptype  { for _, id := range $2 { $$ = append($$, pVar{name:id, typ:$4}) } }
+          | id_list ':' ptype { for _, id := range $1 { $$ = append($$, pVar{name:id, typ:$3}) } }
           ;
 
 compound_stmt : tBEGIN opt_stmts tEND
