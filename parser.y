@@ -11,10 +11,14 @@ import "log"
         i int
         s string
 
-
         vars []pVar
+        typedefs []typTypedef
         strings []string
         ptyp pType
+        program pProgram
+        functions []pFunction
+        function pFunction
+        decls pDecls
 }
 
 %token <f> tFNUMBER
@@ -33,18 +37,21 @@ import "log"
 
 %type <strings> id_list
 %type <ptyp> standard_type ptype
-%type <vars> param_list param_list_list
+%type <vars> param_list param_list_list arguments
+%type <decls> decls
+%type <functions> subprog_decls
+%type <function> subprog_decl subprog_head
 %%
 
-pascal_program : tPROGRAM tID ';' decls subprog_decls compound_stmt '.' ;
+pascal_program : tPROGRAM tID ';' decls subprog_decls compound_stmt '.' { log.Printf("%#v", pProgram{name:$2, vars:$4.vars, types:$4.types, subprogs:$5}) } ;
 
 id_list : id_list ',' tID { $$ = append($1, $3); }
         | tID { $$ = append($$, $1) }
         ;
 
-decls: decls tVAR id_list ':' ptype ';' { log.Println("decl var", $3, $5) }
-     | decls tTYPE tID '=' ptype ';' { log.Println("decl type", $3, $5) }
-     |  /* empty */
+decls: decls tVAR id_list ':' ptype ';' { for _, id := range $3 { $$.vars = append($$.vars, pVar{name:id, typ:$5}) } }
+     | decls tTYPE tID '=' ptype ';' { $$.types = append($1.types, typTypedef{name:$3, typ:$5}) }
+     | { $$ = pDecls{} } /* empty */
      ;
 
 ptype: standard_type { $$ = $1 }
@@ -63,19 +70,19 @@ standard_type: tINTEGER { $$ = typPrimitive{primInt} }
              | tSTRING { $$ = typPrimitive{primString} }
              ;
 
-subprog_decls: subprog_decls subprog_decl
-             | /* empty */
+subprog_decls: subprog_decls subprog_decl { $$ = append($1, $2) }
+             | { $$ = nil }/* empty */
              ;
 
-subprog_decl : subprog_head decls compound_stmt ';'
+subprog_decl : subprog_head decls compound_stmt ';' { $1.decls = $2.vars; $$ = $1 }
               ;
 
-subprog_head: tFUNCTION tID arguments ':' standard_type ';'
-            | tPROCEDURE tID arguments ';'
+subprog_head: tFUNCTION tID arguments ':' standard_type ';' { $$ = pFunction{name:$2, args:$3, ret:$5} }
+            | tPROCEDURE tID arguments ';' { $$ = pFunction{name:$2, args:$3, ret:typVoid{}} }
             ;
 
-arguments: '(' param_list_list ')'
-         | /* empty */
+arguments: '(' param_list_list ')' { $$ = $2 }
+         | /* empty */ { $$ = nil }
          ;
 
 param_list_list: param_list_list ';' param_list { $$ = append($1, $3...) }
@@ -113,7 +120,7 @@ expr_list: expr_list ',' expr
          | expr
          ;
 
-expr: tID '(' expr_list ')' 
+expr: tID '(' expr_list ')'
     | '@' variable
     | '+' expr %prec UMINUS
     | '-' expr %prec UMINUS

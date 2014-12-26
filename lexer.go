@@ -372,3 +372,4 @@ func (p *pascalLexer) Lex(lval *yySymType) int  {
 func (p *pascalLexer) Error(s string) {
     fmt.Println("syntax error:", s)
 }
+

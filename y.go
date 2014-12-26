@@ -13,9 +13,14 @@ type yySymType struct {
 	i   int
 	s   string
 
-	vars    []pVar
-	strings []string
-	ptyp    pType
+	vars      []pVar
+	typedefs  []typTypedef
+	strings   []string
+	ptyp      pType
+	program   pProgram
+	functions []pFunction
+	function  pFunction
+	decls     pDecls
 }
 
 const tFNUMBER = 57346
@@ -209,7 +214,7 @@ var yyAct = []int{
 	13, 54, 53, 46, 57, 74, 31, 16, 103, 83,
 	61, 14, 65, 58, 75, 33, 32, 78, 17, 56,
 	94, 93, 3, 60, 161, 163, 170, 166, 161, 52,
-	168, 153, 19, 87, 12, 169, 10, 6, 1, 0,
+	168, 153, 19, 87, 1, 169, 12, 10, 6, 0,
 	55, 88, 0, 22, 167, 0, 175, 0, 48, 49,
 	96, 0, 0, 0, 97, 98, 99, 22, 173, 100,
 	51, 0, 47, 0, 87, 0, 0, 0, 0, 0,
@@ -262,15 +267,15 @@ var yyPact = []int{
 }
 var yyPgo = []int{
 
-	0, 4, 1, 2, 3, 9, 168, 123, 167, 108,
-	6, 166, 164, 162, 122, 16, 15, 0, 5,
+	0, 4, 1, 2, 3, 9, 6, 123, 168, 167,
+	166, 164, 108, 162, 122, 16, 15, 0, 5,
 }
 var yyR1 = []int{
 
-	0, 6, 1, 1, 7, 7, 7, 3, 3, 3,
+	0, 11, 1, 1, 7, 7, 7, 3, 3, 3,
 	3, 3, 3, 3, 2, 2, 2, 2, 2, 8,
-	8, 11, 12, 12, 10, 10, 5, 5, 4, 4,
-	9, 13, 13, 14, 14, 15, 15, 15, 15, 15,
+	8, 9, 10, 10, 6, 6, 5, 5, 4, 4,
+	12, 13, 13, 14, 14, 15, 15, 15, 15, 15,
 	15, 15, 15, 15, 15, 15, 18, 18, 17, 17,
 	17, 17, 17, 17, 17, 17, 17, 17, 17, 17,
 	17, 17, 17, 17, 17, 17, 17, 17, 17, 17,
@@ -289,19 +294,19 @@ var yyR2 = []int{
 }
 var yyChk = []int{
 
-	-1000, -6, 36, 6, 56, -7, -8, 46, 44, -9,
-	-11, 11, -12, 24, 35, -1, 6, 6, 57, -13,
-	-14, -15, -16, 13, 15, 6, -9, 27, 23, 47,
+	-1000, -11, 36, 6, 56, -7, -8, 46, 44, -12,
+	-9, 11, -10, 24, 35, -1, 6, 6, 57, -13,
+	-14, -15, -16, 13, 15, 6, -12, 27, 23, 47,
 	39, -7, 6, 6, 58, 59, 50, 21, -15, 56,
 	10, 60, 57, 62, 63, -17, 6, 65, 51, 52,
 	-16, 63, 32, 5, 4, 43, 22, 7, 6, -17,
-	-14, -9, -10, 63, -10, 6, -3, -2, 6, 9,
+	-14, -12, -6, 63, -6, 6, -3, -2, 6, 9,
 	62, 38, 24, 35, 28, 37, 14, 12, 40, -3,
 	56, -17, -17, 6, -18, -17, 41, 8, 16, 48,
 	50, 49, 52, 54, 53, 51, 25, 29, 30, 31,
 	34, 63, -16, 6, -17, -17, -17, -17, 10, 17,
 	45, 56, 59, -5, -4, 46, -1, 56, 56, 60,
-	-3, -5, -10, -10, 56, 61, 64, 58, -15, -17,
+	-3, -5, -6, -6, 56, 61, 64, 58, -15, -17,
 	-17, -17, -17, -17, -17, -17, -17, -17, -17, -17,
 	-17, -17, -17, -18, 64, -17, -15, -17, -2, 64,
 	56, -1, 59, 5, 56, 59, -17, 20, 64, 42,
@@ -579,105 +584,153 @@ yydefault:
 	// dummy call; replaced with literal code
 	switch yynt {
 
+	case 1:
+		//line parser.y:46
+		{
+			log.Printf("%#v", pProgram{name: yyS[yypt-5].s, vars: yyS[yypt-3].decls.vars, types: yyS[yypt-3].decls.types, subprogs: yyS[yypt-2].functions})
+		}
 	case 2:
-		//line parser.y:41
+		//line parser.y:48
 		{
 			yyVAL.strings = append(yyS[yypt-2].strings, yyS[yypt-0].s)
 		}
 	case 3:
-		//line parser.y:42
+		//line parser.y:49
 		{
 			yyVAL.strings = append(yyVAL.strings, yyS[yypt-0].s)
 		}
 	case 4:
-		//line parser.y:45
+		//line parser.y:52
 		{
-			log.Println("decl var", yyS[yypt-3].strings, yyS[yypt-1].ptyp)
+			for _, id := range yyS[yypt-3].strings {
+				yyVAL.decls.vars = append(yyVAL.decls.vars, pVar{name: id, typ: yyS[yypt-1].ptyp})
+			}
 		}
 	case 5:
-		//line parser.y:46
+		//line parser.y:53
 		{
-			log.Println("decl type", yyS[yypt-3].s, yyS[yypt-1].ptyp)
+			yyVAL.decls.types = append(yyS[yypt-5].decls.types, typTypedef{name: yyS[yypt-3].s, typ: yyS[yypt-1].ptyp})
+		}
+	case 6:
+		//line parser.y:54
+		{
+			yyVAL.decls = pDecls{}
 		}
 	case 7:
-		//line parser.y:50
+		//line parser.y:57
 		{
 			yyVAL.ptyp = yyS[yypt-0].ptyp
 		}
 	case 8:
-		//line parser.y:51
+		//line parser.y:58
 		{
 			yyVAL.ptyp = typTypedef{name: yyS[yypt-0].s}
 		}
 	case 9:
-		//line parser.y:52
+		//line parser.y:59
 		{
 			yyVAL.ptyp = typArray{start: yyS[yypt-5].i, end: yyS[yypt-3].i, typ: yyS[yypt-0].ptyp}
 		}
 	case 10:
-		//line parser.y:53
+		//line parser.y:60
 		{
 			yyVAL.ptyp = typPointer{typ: yyS[yypt-0].ptyp}
 		}
 	case 11:
-		//line parser.y:54
+		//line parser.y:61
 		{
 			yyVAL.ptyp = typRecord{fields: yyS[yypt-2].vars}
 		}
 	case 12:
-		//line parser.y:55
+		//line parser.y:62
 		{
 			yyVAL.ptyp = typVoid{}
 		}
 	case 13:
-		//line parser.y:56
+		//line parser.y:63
 		{
 			yyVAL.ptyp = typVoid{}
 		}
 	case 14:
-		//line parser.y:59
+		//line parser.y:66
 		{
 			yyVAL.ptyp = typPrimitive{primInt}
 		}
 	case 15:
-		//line parser.y:60
+		//line parser.y:67
 		{
 			yyVAL.ptyp = typPrimitive{primReal}
 		}
 	case 16:
-		//line parser.y:61
+		//line parser.y:68
 		{
 			yyVAL.ptyp = typPrimitive{primChar}
 		}
 	case 17:
-		//line parser.y:62
+		//line parser.y:69
 		{
 			yyVAL.ptyp = typPrimitive{primBool}
 		}
 	case 18:
-		//line parser.y:63
+		//line parser.y:70
 		{
 			yyVAL.ptyp = typPrimitive{primString}
 		}
-	case 26:
+	case 19:
+		//line parser.y:73
+		{
+			yyVAL.functions = append(yyS[yypt-1].functions, yyS[yypt-0].function)
+		}
+	case 20:
+		//line parser.y:74
+		{
+			yyVAL.functions = nil
+		}
+	case 21:
+		//line parser.y:77
+		{
+			yyS[yypt-3].function.decls = yyS[yypt-2].decls.vars
+			yyVAL.function = yyS[yypt-3].function
+		}
+	case 22:
+		//line parser.y:80
+		{
+			yyVAL.function = pFunction{name: yyS[yypt-4].s, args: yyS[yypt-3].vars, ret: yyS[yypt-1].ptyp}
+		}
+	case 23:
 		//line parser.y:81
+		{
+			yyVAL.function = pFunction{name: yyS[yypt-2].s, args: yyS[yypt-1].vars, ret: typVoid{}}
+		}
+	case 24:
+		//line parser.y:84
+		{
+			yyVAL.vars = yyS[yypt-1].vars
+		}
+	case 25:
+		//line parser.y:85
+		{
+			yyVAL.vars = nil
+		}
+	case 26:
+		//line parser.y:88
 		{
 			yyVAL.vars = append(yyS[yypt-2].vars, yyS[yypt-0].vars...)
 		}
 	case 27:
-		//line parser.y:82
+		//line parser.y:89
 		{
 			yyVAL.vars = yyS[yypt-0].vars
 		}
 	case 28:
-		//line parser.y:85
+		//line parser.y:92
 		{
 			for _, id := range yyS[yypt-2].strings {
 				yyVAL.vars = append(yyVAL.vars, pVar{name: id, typ: yyS[yypt-0].ptyp})
 			}
 		}
 	case 29:
-		//line parser.y:86
+		//line parser.y:93
 		{
 			for _, id := range yyS[yypt-2].strings {
 				yyVAL.vars = append(yyVAL.vars, pVar{name: id, typ: yyS[yypt-0].ptyp})
