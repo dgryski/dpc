@@ -96,3 +96,79 @@ type typTypedef struct {
 }
 
 func (t typTypedef) Size() int { return t.typ.Size() }
+
+type expr interface {
+	IsLValue()
+	exprNode()
+}
+
+type expConst struct {
+	i int
+	f float64
+	s string
+
+	t pType
+}
+
+func (c expConst) IsLValue() bool { return false }
+
+type expId struct {
+	name  string
+	byRef bool
+
+	// bound
+
+}
+
+func (c expId) IsLValue() bool { return true }
+
+type expField struct {
+	record typRecord
+	field  pVar
+}
+
+func (c expField) IsLValue() bool { return true }
+
+type expCall struct {
+	fn   expr
+	args []expr
+}
+
+func (c expCall) IsLValue() bool { return true }
+
+type unop byte
+
+const (
+	unopNot unop = iota
+	unopPtr
+	unopAt
+)
+
+type expUnop struct {
+	op unop
+	e  expr
+}
+
+type binop byte
+
+const (
+	binAND binop = iota
+	binDIV
+	binLT
+	binEQ
+	binGT
+	binSUB
+	binFDIV
+	binMUL
+	binADD
+	binGE
+	binLE
+	binMOD
+	binNE
+	binOR
+)
+
+type expBinop struct {
+	op          binop
+	left, right expr
+}

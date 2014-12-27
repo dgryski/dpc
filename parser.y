@@ -19,6 +19,8 @@ import "log"
         functions []pFunction
         function pFunction
         decls pDecls
+        expr expr
+        exprs []expr
 }
 
 %token <f> tFNUMBER
