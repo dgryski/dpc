@@ -50,7 +50,7 @@ func lex(data []byte) []tok {
 		'>=' => { add(tGE) };
 		'<=' => { add(tLE) };
 		'<>' => { add(tNE) };
-		'\'' [^']* '\''  => { add(tQSTRING) };
+		'\'' [^']* '\''  => { addstr(tQSTRING, string(data[ts:te])) };
 		'{' [^}]* '}'  => { lineno += bytes.Count(data[ts:te], []byte{'\n'}) };
 		[ \t] => { };
 		'\n' => { lineno++ };

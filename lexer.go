@@ -259,7 +259,7 @@ te = p+1
 		case 9:
 //line lexer.rl:53
 te = p+1
-{ add(tQSTRING) }
+{ addstr(tQSTRING, string(data[ts:te])) }
 		case 10:
 //line lexer.rl:54
 te = p+1
