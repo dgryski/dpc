@@ -98,7 +98,7 @@ type typTypedef struct {
 func (t typTypedef) Size() int { return t.typ.Size() }
 
 type expr interface {
-	IsLValue()
+	IsLValue() bool
 	exprNode()
 }
 
@@ -106,11 +106,13 @@ type expConst struct {
 	i int
 	f float64
 	s string
+	b bool
 
-	t pType
+	t Primitive
 }
 
-func (c expConst) IsLValue() bool { return false }
+func (e expConst) IsLValue() bool { return false }
+func (e expConst) exprNode()      {}
 
 type expId struct {
 	name  string
@@ -120,21 +122,25 @@ type expId struct {
 
 }
 
-func (c expId) IsLValue() bool { return true }
+func (e expId) IsLValue() bool { return true }
+func (e expId) exprNode()      {}
 
 type expField struct {
+	e      expr
 	record typRecord
 	field  pVar
 }
 
-func (c expField) IsLValue() bool { return true }
+func (e expField) IsLValue() bool { return true }
+func (e expField) exprNode()      {}
 
 type expCall struct {
-	fn   expr
+	fn   pVar
 	args []expr
 }
 
-func (c expCall) IsLValue() bool { return true }
+func (e expCall) IsLValue() bool { return true }
+func (e expCall) exprNode()      {}
 
 type unop byte
 
@@ -142,12 +148,17 @@ const (
 	unopNot unop = iota
 	unopPtr
 	unopAt
+	unopMinus
+	unopPlus
 )
 
 type expUnop struct {
 	op unop
 	e  expr
 }
+
+func (e expUnop) IsLValue() bool { return e.op == unopPtr }
+func (e expUnop) exprNode()      {}
 
 type binop byte
 
@@ -166,9 +177,13 @@ const (
 	binMOD
 	binNE
 	binOR
+	binArrayIndex
 )
 
 type expBinop struct {
 	op          binop
 	left, right expr
 }
+
+func (e expBinop) IsLValue() bool { return false }
+func (e expBinop) exprNode()      {}

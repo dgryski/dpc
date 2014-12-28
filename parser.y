@@ -43,6 +43,8 @@ import "log"
 %type <decls> decls
 %type <functions> subprog_decls
 %type <function> subprog_decl subprog_head
+%type <exprs> expr_list
+%type <expr> expr variable
 %%
 
 pascal_program : tPROGRAM tID ';' decls subprog_decls compound_stmt '.' { log.Printf("%#v", pProgram{name:$2, vars:$4.vars, types:$4.types, subprogs:$5}) } ;
@@ -118,40 +120,41 @@ stmt : variable tASSIGN expr
      | tREPEAT stmt_list tUNTIL expr
      ;
 
-expr_list: expr_list ',' expr
-         | expr
+expr_list: expr_list ',' expr { $$ = append($1, $3) }
+         | expr { $$ = []expr{$1} }
          ;
 
-expr: tID '(' expr_list ')'
-    | '@' variable
-    | '+' expr %prec UMINUS
-    | '-' expr %prec UMINUS
-    | variable
-    | expr tAND expr
-    | expr tDIV expr
-    | expr '<' expr
-    | expr '=' expr
-    | expr '>' expr
-    | expr '-' expr
-    | expr '/' expr
-    | expr '*' expr
-    | expr '+' expr
-    | expr tGE expr
-    | expr tLE expr
-    | expr tMOD expr
-    | expr tNE expr
-    | expr tOR expr
-    | '(' expr ')'
-    | tNOT expr
-    | tNUMBER
-    | tFNUMBER
-    | tTRUE
-    | tFALSE
-    | tQSTRING
+expr: tID '(' expr_list ')' { $$ = expCall{fn:pVar{name:$1}, args: $3} }
+    | '@' variable { $$ = expUnop{op:unopAt, e:$2} }
+    | '+' expr %prec UMINUS { $$ = expUnop{op:unopPlus, e:$2} }
+    | '-' expr %prec UMINUS { $$ = expUnop{op:unopMinus,  e:$2} }
+    | variable { $$ = $1 }
+    | expr tAND expr { $$ = expBinop{op:binAND, left:$1, right: $3} }
+    | expr tDIV expr { $$ = expBinop{op:binDIV, left:$1, right: $3} }
+    | expr '<' expr { $$ = expBinop{op:binLT, left:$1, right: $3} }
+    | expr '=' expr { $$ = expBinop{op:binEQ, left:$1, right: $3} }
+    | expr '>' expr { $$ = expBinop{op:binGT, left:$1, right: $3} }
+    | expr '-' expr { $$ = expBinop{op:binSUB, left:$1, right: $3} }
+    | expr '/' expr { $$ = expBinop{op:binFDIV, left:$1, right: $3} }
+    | expr '*' expr { $$ = expBinop{op:binMUL, left:$1, right: $3} }
+    | expr '+' expr { $$ = expBinop{op:binADD, left:$1, right: $3} }
+    | expr tGE expr { $$ = expBinop{op:binGE, left:$1, right: $3} }
+    | expr tLE expr { $$ = expBinop{op:binLE, left:$1, right: $3} }
+    | expr tMOD expr { $$ = expBinop{op:binMOD, left:$1, right: $3} }
+    | expr tNE expr { $$ = expBinop{op:binNE, left:$1, right: $3} }
+    | expr tOR expr { $$ = expBinop{op:binOR, left:$1, right: $3} }
+    | '(' expr ')' { $$ = $2 }
+    | tNOT expr { $$ = expUnop{op:unopNot, e:$2} }
+    | tNUMBER   { $$ = expConst{t:primInt, i:$1} }
+    | tFNUMBER{ $$ = expConst{t:primInt, f:$1} }
+    | tTRUE { $$ = expConst{t:primInt, b:true} }
+    | tFALSE { $$ = expConst{t:primInt, b:false} }
+    | tQSTRING{ $$ = expConst{t:primInt, s:$1} }
+
     ;
 
-variable: tID
-    | variable '[' expr ']'
-    | variable '.' tID
-    | variable '^'
+variable: tID { $$ = expId{name:$1} }
+    | variable '[' expr ']' { $$ = expBinop{op:binArrayIndex, left:$1, right:$3} }
+    | variable '.' tID { $$ = expField{e:$1, field:pVar{name:$3}} }
+    | variable '^' { $$ = expUnop{op:unopPtr, e:$1} }
     ;
