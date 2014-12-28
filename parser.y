@@ -146,11 +146,10 @@ expr: tID '(' expr_list ')' { $$ = expCall{fn:pVar{name:$1}, args: $3} }
     | '(' expr ')' { $$ = $2 }
     | tNOT expr { $$ = expUnop{op:unopNot, e:$2} }
     | tNUMBER   { $$ = expConst{t:primInt, i:$1} }
-    | tFNUMBER{ $$ = expConst{t:primInt, f:$1} }
-    | tTRUE { $$ = expConst{t:primInt, b:true} }
-    | tFALSE { $$ = expConst{t:primInt, b:false} }
-    | tQSTRING{ $$ = expConst{t:primInt, s:$1} }
-
+    | tFNUMBER{ $$ = expConst{t:primReal, f:$1} }
+    | tTRUE { $$ = expConst{t:primBool, b:true} }
+    | tFALSE { $$ = expConst{t:primBool, b:false} }
+    | tQSTRING{ $$ = expConst{t:primString, s:$1} }
     ;
 
 variable: tID { $$ = expId{name:$1} }

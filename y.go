@@ -861,40 +861,40 @@ yydefault:
 	case 70:
 		//line parser.y:149
 		{
-			yyVAL.expr = expConst{t: primInt, f: yyS[yypt-0].f}
+			yyVAL.expr = expConst{t: primReal, f: yyS[yypt-0].f}
 		}
 	case 71:
 		//line parser.y:150
 		{
-			yyVAL.expr = expConst{t: primInt, b: true}
+			yyVAL.expr = expConst{t: primBool, b: true}
 		}
 	case 72:
 		//line parser.y:151
 		{
-			yyVAL.expr = expConst{t: primInt, b: false}
+			yyVAL.expr = expConst{t: primBool, b: false}
 		}
 	case 73:
 		//line parser.y:152
 		{
-			yyVAL.expr = expConst{t: primInt, s: yyS[yypt-0].s}
+			yyVAL.expr = expConst{t: primString, s: yyS[yypt-0].s}
 		}
 	case 74:
-		//line parser.y:156
+		//line parser.y:155
 		{
 			yyVAL.expr = expId{name: yyS[yypt-0].s}
 		}
 	case 75:
-		//line parser.y:157
+		//line parser.y:156
 		{
 			yyVAL.expr = expBinop{op: binArrayIndex, left: yyS[yypt-3].expr, right: yyS[yypt-1].expr}
 		}
 	case 76:
-		//line parser.y:158
+		//line parser.y:157
 		{
 			yyVAL.expr = expField{e: yyS[yypt-2].expr, field: pVar{name: yyS[yypt-0].s}}
 		}
 	case 77:
-		//line parser.y:159
+		//line parser.y:158
 		{
 			yyVAL.expr = expUnop{op: unopPtr, e: yyS[yypt-1].expr}
 		}
