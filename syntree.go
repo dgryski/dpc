@@ -17,7 +17,7 @@ type varId struct {
 type varFunction struct {
 	name  string
 	args  []varId
-	ret   pType
+	ret   varId
 	decls []varId
 	body  []stmt
 }

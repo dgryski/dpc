@@ -85,8 +85,8 @@ subprog_decls: subprog_decls subprog_decl { $$ = append($1, $2) }
 subprog_decl : subprog_head decls compound_stmt ';' { $1.decls = $2.vars; $1.body = $3; $$ = $1 }
               ;
 
-subprog_head: tFUNCTION tID arguments ':' standard_type ';' { $$ = varFunction{name:$2, args:$3, ret:$5} }
-            | tPROCEDURE tID arguments ';' { $$ = varFunction{name:$2, args:$3, ret:typVoid{}} }
+subprog_head: tFUNCTION tID arguments ':' standard_type ';' { $$ = varFunction{name:$2, args:$3, ret:varId{typ:$5}}}
+            | tPROCEDURE tID arguments ';' { $$ = varFunction{name:$2, args:$3, ret:varId{typ:typVoid{}}} }
             ;
 
 arguments: '(' param_list_list ')' { $$ = $2 }

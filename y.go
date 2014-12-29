@@ -700,12 +700,12 @@ yydefault:
 	case 22:
 		//line parser.y:88
 		{
-			yyVAL.function = varFunction{name: yyS[yypt-4].s, args: yyS[yypt-3].vars, ret: yyS[yypt-1].ptyp}
+			yyVAL.function = varFunction{name: yyS[yypt-4].s, args: yyS[yypt-3].vars, ret: varId{typ: yyS[yypt-1].ptyp}}
 		}
 	case 23:
 		//line parser.y:89
 		{
-			yyVAL.function = varFunction{name: yyS[yypt-2].s, args: yyS[yypt-1].vars, ret: typVoid{}}
+			yyVAL.function = varFunction{name: yyS[yypt-2].s, args: yyS[yypt-1].vars, ret: varId{typ: typVoid{}}}
 		}
 	case 24:
 		//line parser.y:92
