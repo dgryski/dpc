@@ -819,7 +819,7 @@ yydefault:
 	case 45:
 		//line parser.y:124
 		{
-			yyVAL.stmt = stmRepeat{e: yyS[yypt-0].expr, body: yyS[yypt-2].stmts}
+			yyVAL.stmt = stmRepeat{e: yyS[yypt-0].expr, body: stmBlock{yyS[yypt-2].stmts}}
 		}
 	case 46:
 		//line parser.y:127

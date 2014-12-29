@@ -231,7 +231,7 @@ type stmWhile struct {
 }
 type stmRepeat struct {
 	e    expr
-	body []stmt
+	body stmt
 }
 
 type stmBlock struct {

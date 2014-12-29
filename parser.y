@@ -121,7 +121,7 @@ stmt : variable tASSIGN expr { $$ = stmAssign{id:$1, e:$3} }
      | tIF expr tTHEN stmt tELSE stmt { $$ = stmIf{cond:$2, ifTrue:$4, ifFalse:$6} }
      | tFOR tID tASSIGN expr tTO expr tDO stmt { $$ = stmFor{counter:varId{name:$2}, expr1:$4, expr2:$6, body:$8} }
      | tWHILE expr tDO stmt { $$ = stmWhile{e:$2, body:$4} }
-     | tREPEAT stmt_list tUNTIL expr { $$ = stmRepeat{e:$4, body:$2} }
+     | tREPEAT stmt_list tUNTIL expr { $$ = stmRepeat{e:$4, body:stmBlock{$2}} }
      ;
 
 expr_list: expr_list ',' expr { $$ = append($1, $3) }
