@@ -5,7 +5,7 @@ type varProgram struct {
 	vars     []varId
 	types    []typTypedef
 	subprogs []varFunction
-	body     []stmt
+	body     stmt
 }
 
 type varId struct {
@@ -19,7 +19,7 @@ type varFunction struct {
 	args  []varId
 	ret   varId
 	decls []varId
-	body  []stmt
+	body  stmt
 }
 
 type pType interface {

@@ -47,8 +47,8 @@ import "log"
 %type <function> subprog_decl subprog_head
 %type <exprs> expr_list
 %type <expr> expr variable
-%type <stmt> stmt
-%type <stmts> stmt_list compound_stmt opt_stmts
+%type <stmt> stmt compound_stmt
+%type <stmts> stmt_list opt_stmts
 %%
 
 pascal_program : tPROGRAM tID ';' decls subprog_decls compound_stmt '.' { log.Printf("%#v", varProgram{name:$2, vars:$4.vars, types:$4.types, subprogs:$5, body:$6}) } ;
@@ -101,7 +101,7 @@ param_list: tVAR id_list ':' ptype  { for _, id := range $2 { $$ = append($$, va
           | id_list ':' ptype { for _, id := range $1 { $$ = append($$, varId{name:id, typ:$3}) } }
           ;
 
-compound_stmt : tBEGIN opt_stmts tEND { $$ = $2 }
+compound_stmt : tBEGIN opt_stmts tEND { $$ = stmBlock{stmts:$2} }
 
 opt_stmts : stmt_list { $$ = $1 }
           | /* empty */ { $$ = nil }
@@ -116,7 +116,7 @@ stmt : variable tASSIGN expr { $$ = stmAssign{id:$1, e:$3} }
      | tCONTINUE { $$ = stmContinue{} }
      | tID '(' expr_list ')' { $$ = stmCall{fn:varId{name:$1}, args:$3} }
      | tID  { $$ = stmCall{fn:varId{name:$1}} }
-     | compound_stmt { $$ = stmBlock{stmts:$1} }
+     | compound_stmt { $$ = $1 }
      | tIF expr tTHEN stmt { $$ = stmIf{cond:$2, ifTrue:$4} }
      | tIF expr tTHEN stmt tELSE stmt { $$ = stmIf{cond:$2, ifTrue:$4, ifFalse:$6} }
      | tFOR tID tASSIGN expr tTO expr tDO stmt { $$ = stmFor{} }

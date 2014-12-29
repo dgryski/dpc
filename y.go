@@ -272,14 +272,14 @@ var yyPact = []int{
 var yyPgo = []int{
 
 	0, 4, 1, 2, 3, 9, 6, 123, 168, 167,
-	166, 5, 0, 15, 16, 122, 108, 164, 162,
+	166, 5, 0, 15, 16, 108, 122, 164, 162,
 }
 var yyR1 = []int{
 
 	0, 18, 1, 1, 7, 7, 7, 3, 3, 3,
 	3, 3, 3, 3, 2, 2, 2, 2, 2, 8,
 	8, 9, 10, 10, 6, 6, 5, 5, 4, 4,
-	16, 17, 17, 15, 15, 14, 14, 14, 14, 14,
+	15, 17, 17, 16, 16, 14, 14, 14, 14, 14,
 	14, 14, 14, 14, 14, 14, 11, 11, 12, 12,
 	12, 12, 12, 12, 12, 12, 12, 12, 12, 12,
 	12, 12, 12, 12, 12, 12, 12, 12, 12, 12,
@@ -298,13 +298,13 @@ var yyR2 = []int{
 }
 var yyChk = []int{
 
-	-1000, -18, 36, 6, 56, -7, -8, 46, 44, -16,
+	-1000, -18, 36, 6, 56, -7, -8, 46, 44, -15,
 	-9, 11, -10, 24, 35, -1, 6, 6, 57, -17,
-	-15, -14, -13, 13, 15, 6, -16, 27, 23, 47,
+	-16, -14, -13, 13, 15, 6, -15, 27, 23, 47,
 	39, -7, 6, 6, 58, 59, 50, 21, -14, 56,
 	10, 60, 57, 62, 63, -12, 6, 65, 51, 52,
 	-13, 63, 32, 5, 4, 43, 22, 7, 6, -12,
-	-15, -16, -6, 63, -6, 6, -3, -2, 6, 9,
+	-16, -15, -6, 63, -6, 6, -3, -2, 6, 9,
 	62, 38, 24, 35, 28, 37, 14, 12, 40, -3,
 	56, -12, -12, 6, -11, -12, 41, 8, 16, 48,
 	50, 49, 52, 54, 53, 51, 25, 29, 30, 31,
@@ -591,7 +591,7 @@ yydefault:
 	case 1:
 		//line parser.y:54
 		{
-			log.Printf("%#v", varProgram{name: yyS[yypt-5].s, vars: yyS[yypt-3].decls.vars, types: yyS[yypt-3].decls.types, subprogs: yyS[yypt-2].functions, body: yyS[yypt-1].stmts})
+			log.Printf("%#v", varProgram{name: yyS[yypt-5].s, vars: yyS[yypt-3].decls.vars, types: yyS[yypt-3].decls.types, subprogs: yyS[yypt-2].functions, body: yyS[yypt-1].stmt})
 		}
 	case 2:
 		//line parser.y:56
@@ -694,7 +694,7 @@ yydefault:
 		//line parser.y:85
 		{
 			yyS[yypt-3].function.decls = yyS[yypt-2].decls.vars
-			yyS[yypt-3].function.body = yyS[yypt-1].stmts
+			yyS[yypt-3].function.body = yyS[yypt-1].stmt
 			yyVAL.function = yyS[yypt-3].function
 		}
 	case 22:
@@ -744,7 +744,7 @@ yydefault:
 	case 30:
 		//line parser.y:104
 		{
-			yyVAL.stmts = yyS[yypt-1].stmts
+			yyVAL.stmt = stmBlock{stmts: yyS[yypt-1].stmts}
 		}
 	case 31:
 		//line parser.y:106
@@ -794,7 +794,7 @@ yydefault:
 	case 40:
 		//line parser.y:119
 		{
-			yyVAL.stmt = stmBlock{stmts: yyS[yypt-0].stmts}
+			yyVAL.stmt = yyS[yypt-0].stmt
 		}
 	case 41:
 		//line parser.y:120
