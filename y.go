@@ -13,13 +13,13 @@ type yySymType struct {
 	i   int
 	s   string
 
-	vars      []pVar
+	vars      []varId
 	typedefs  []typTypedef
 	strings   []string
 	ptyp      pType
-	program   pProgram
-	functions []pFunction
-	function  pFunction
+	program   varProgram
+	functions []varFunction
+	function  varFunction
 	decls     pDecls
 	expr      expr
 	exprs     []expr
@@ -591,7 +591,7 @@ yydefault:
 	case 1:
 		//line parser.y:54
 		{
-			log.Printf("%#v", pProgram{name: yyS[yypt-5].s, vars: yyS[yypt-3].decls.vars, types: yyS[yypt-3].decls.types, subprogs: yyS[yypt-2].functions, body: yyS[yypt-1].stmts})
+			log.Printf("%#v", varProgram{name: yyS[yypt-5].s, vars: yyS[yypt-3].decls.vars, types: yyS[yypt-3].decls.types, subprogs: yyS[yypt-2].functions, body: yyS[yypt-1].stmts})
 		}
 	case 2:
 		//line parser.y:56
@@ -607,7 +607,7 @@ yydefault:
 		//line parser.y:60
 		{
 			for _, id := range yyS[yypt-3].strings {
-				yyVAL.decls.vars = append(yyVAL.decls.vars, pVar{name: id, typ: yyS[yypt-1].ptyp})
+				yyVAL.decls.vars = append(yyVAL.decls.vars, varId{name: id, typ: yyS[yypt-1].ptyp})
 			}
 		}
 	case 5:
@@ -700,12 +700,12 @@ yydefault:
 	case 22:
 		//line parser.y:88
 		{
-			yyVAL.function = pFunction{name: yyS[yypt-4].s, args: yyS[yypt-3].vars, ret: yyS[yypt-1].ptyp}
+			yyVAL.function = varFunction{name: yyS[yypt-4].s, args: yyS[yypt-3].vars, ret: yyS[yypt-1].ptyp}
 		}
 	case 23:
 		//line parser.y:89
 		{
-			yyVAL.function = pFunction{name: yyS[yypt-2].s, args: yyS[yypt-1].vars, ret: typVoid{}}
+			yyVAL.function = varFunction{name: yyS[yypt-2].s, args: yyS[yypt-1].vars, ret: typVoid{}}
 		}
 	case 24:
 		//line parser.y:92
@@ -731,14 +731,14 @@ yydefault:
 		//line parser.y:100
 		{
 			for _, id := range yyS[yypt-2].strings {
-				yyVAL.vars = append(yyVAL.vars, pVar{name: id, typ: yyS[yypt-0].ptyp})
+				yyVAL.vars = append(yyVAL.vars, varId{name: id, typ: yyS[yypt-0].ptyp})
 			}
 		}
 	case 29:
 		//line parser.y:101
 		{
 			for _, id := range yyS[yypt-2].strings {
-				yyVAL.vars = append(yyVAL.vars, pVar{name: id, typ: yyS[yypt-0].ptyp})
+				yyVAL.vars = append(yyVAL.vars, varId{name: id, typ: yyS[yypt-0].ptyp})
 			}
 		}
 	case 30:
@@ -784,12 +784,12 @@ yydefault:
 	case 38:
 		//line parser.y:117
 		{
-			yyVAL.stmt = stmCall{fn: pVar{name: yyS[yypt-3].s}, args: yyS[yypt-1].exprs}
+			yyVAL.stmt = stmCall{fn: varId{name: yyS[yypt-3].s}, args: yyS[yypt-1].exprs}
 		}
 	case 39:
 		//line parser.y:118
 		{
-			yyVAL.stmt = stmCall{fn: pVar{name: yyS[yypt-0].s}}
+			yyVAL.stmt = stmCall{fn: varId{name: yyS[yypt-0].s}}
 		}
 	case 40:
 		//line parser.y:119
@@ -834,7 +834,7 @@ yydefault:
 	case 48:
 		//line parser.y:131
 		{
-			yyVAL.expr = expCall{fn: pVar{name: yyS[yypt-3].s}, args: yyS[yypt-1].exprs}
+			yyVAL.expr = expCall{fn: varId{name: yyS[yypt-3].s}, args: yyS[yypt-1].exprs}
 		}
 	case 49:
 		//line parser.y:132
@@ -964,7 +964,7 @@ yydefault:
 	case 74:
 		//line parser.y:159
 		{
-			yyVAL.expr = expId{name: yyS[yypt-0].s}
+			yyVAL.expr = exvarId{name: yyS[yypt-0].s}
 		}
 	case 75:
 		//line parser.y:160
@@ -974,7 +974,7 @@ yydefault:
 	case 76:
 		//line parser.y:161
 		{
-			yyVAL.expr = expField{e: yyS[yypt-2].expr, field: pVar{name: yyS[yypt-0].s}}
+			yyVAL.expr = expField{e: yyS[yypt-2].expr, field: varId{name: yyS[yypt-0].s}}
 		}
 	case 77:
 		//line parser.y:162

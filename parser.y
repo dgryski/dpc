@@ -11,13 +11,13 @@ import "log"
         i int
         s string
 
-        vars []pVar
+        vars []varId
         typedefs []typTypedef
         strings []string
         ptyp pType
-        program pProgram
-        functions []pFunction
-        function pFunction
+        program varProgram
+        functions []varFunction
+        function varFunction
         decls pDecls
         expr expr
         exprs []expr
@@ -51,13 +51,13 @@ import "log"
 %type <stmts> stmt_list compound_stmt opt_stmts
 %%
 
-pascal_program : tPROGRAM tID ';' decls subprog_decls compound_stmt '.' { log.Printf("%#v", pProgram{name:$2, vars:$4.vars, types:$4.types, subprogs:$5, body:$6}) } ;
+pascal_program : tPROGRAM tID ';' decls subprog_decls compound_stmt '.' { log.Printf("%#v", varProgram{name:$2, vars:$4.vars, types:$4.types, subprogs:$5, body:$6}) } ;
 
 id_list : id_list ',' tID { $$ = append($1, $3); }
         | tID { $$ = append($$, $1) }
         ;
 
-decls: decls tVAR id_list ':' ptype ';' { for _, id := range $3 { $$.vars = append($$.vars, pVar{name:id, typ:$5}) } }
+decls: decls tVAR id_list ':' ptype ';' { for _, id := range $3 { $$.vars = append($$.vars, varId{name:id, typ:$5}) } }
      | decls tTYPE tID '=' ptype ';' { $$.types = append($1.types, typTypedef{name:$3, typ:$5}) }
      | { $$ = pDecls{} } /* empty */
      ;
@@ -85,8 +85,8 @@ subprog_decls: subprog_decls subprog_decl { $$ = append($1, $2) }
 subprog_decl : subprog_head decls compound_stmt ';' { $1.decls = $2.vars; $1.body = $3; $$ = $1 }
               ;
 
-subprog_head: tFUNCTION tID arguments ':' standard_type ';' { $$ = pFunction{name:$2, args:$3, ret:$5} }
-            | tPROCEDURE tID arguments ';' { $$ = pFunction{name:$2, args:$3, ret:typVoid{}} }
+subprog_head: tFUNCTION tID arguments ':' standard_type ';' { $$ = varFunction{name:$2, args:$3, ret:$5} }
+            | tPROCEDURE tID arguments ';' { $$ = varFunction{name:$2, args:$3, ret:typVoid{}} }
             ;
 
 arguments: '(' param_list_list ')' { $$ = $2 }
@@ -97,8 +97,8 @@ param_list_list: param_list_list ';' param_list { $$ = append($1, $3...) }
                | param_list { $$ = $1 }
                ;
 
-param_list: tVAR id_list ':' ptype  { for _, id := range $2 { $$ = append($$, pVar{name:id, typ:$4}) } }
-          | id_list ':' ptype { for _, id := range $1 { $$ = append($$, pVar{name:id, typ:$3}) } }
+param_list: tVAR id_list ':' ptype  { for _, id := range $2 { $$ = append($$, varId{name:id, typ:$4}) } }
+          | id_list ':' ptype { for _, id := range $1 { $$ = append($$, varId{name:id, typ:$3}) } }
           ;
 
 compound_stmt : tBEGIN opt_stmts tEND { $$ = $2 }
@@ -114,8 +114,8 @@ stmt_list : stmt_list stmt ';' { $$ = append($1, $2) }
 stmt : variable tASSIGN expr { $$ = stmAssign{id:$1, e:$3} }
      | tBREAK { $$ = stmBreak{} }
      | tCONTINUE { $$ = stmContinue{} }
-     | tID '(' expr_list ')' { $$ = stmCall{fn:pVar{name:$1}, args:$3} }
-     | tID  { $$ = stmCall{fn:pVar{name:$1}} }
+     | tID '(' expr_list ')' { $$ = stmCall{fn:varId{name:$1}, args:$3} }
+     | tID  { $$ = stmCall{fn:varId{name:$1}} }
      | compound_stmt { $$ = stmBlock{stmts:$1} }
      | tIF expr tTHEN stmt { $$ = stmIf{cond:$2, ifTrue:$4} }
      | tIF expr tTHEN stmt tELSE stmt { $$ = stmIf{cond:$2, ifTrue:$4, ifFalse:$6} }
@@ -128,7 +128,7 @@ expr_list: expr_list ',' expr { $$ = append($1, $3) }
          | expr { $$ = []expr{$1} }
          ;
 
-expr: tID '(' expr_list ')' { $$ = expCall{fn:pVar{name:$1}, args: $3} }
+expr: tID '(' expr_list ')' { $$ = expCall{fn:varId{name:$1}, args: $3} }
     | '@' variable { $$ = expUnop{op:unopAt, e:$2} }
     | '+' expr %prec UMINUS { $$ = expUnop{op:unopPlus, e:$2} }
     | '-' expr %prec UMINUS { $$ = expUnop{op:unopMinus,  e:$2} }
@@ -156,8 +156,8 @@ expr: tID '(' expr_list ')' { $$ = expCall{fn:pVar{name:$1}, args: $3} }
     | tQSTRING { $$ = expConst{t:primString, s:$1}; }
     ;
 
-variable: tID { $$ = expId{name:$1} }
+variable: tID { $$ = exvarId{name:$1} }
     | variable '[' expr ']' { $$ = expBinop{op:binArrayIndex, left:$1, right:$3} }
-    | variable '.' tID { $$ = expField{e:$1, field:pVar{name:$3}} }
+    | variable '.' tID { $$ = expField{e:$1, field:varId{name:$3}} }
     | variable '^' { $$ = expUnop{op:unopPtr, e:$1} }
     ;

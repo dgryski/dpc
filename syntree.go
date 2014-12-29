@@ -1,24 +1,24 @@
 package main
 
-type pProgram struct {
+type varProgram struct {
 	name     string
-	vars     []pVar
+	vars     []varId
 	types    []typTypedef
-	subprogs []pFunction
+	subprogs []varFunction
 	body     []stmt
 }
 
-type pVar struct {
+type varId struct {
 	name        string
 	typ         pType
 	byReference bool
 }
 
-type pFunction struct {
+type varFunction struct {
 	name  string
-	args  []pVar
+	args  []varId
 	ret   pType
-	decls []pVar
+	decls []varId
 	body  []stmt
 }
 
@@ -28,9 +28,17 @@ type pType interface {
 }
 
 type pDecls struct {
-	vars  []pVar
+	vars  []varId
 	types []typTypedef
 }
+
+type pvariable interface {
+	varNode()
+}
+
+func (p varProgram) varNode()  {}
+func (p varId) varNode()       {}
+func (p varFunction) varNode() {}
 
 type Primitive int
 
@@ -62,7 +70,7 @@ type typPrimitive struct {
 func (p typPrimitive) Size() int { return 8 }
 
 type typRecord struct {
-	fields []pVar
+	fields []varId
 }
 
 func (r typRecord) Size() int {
@@ -88,7 +96,7 @@ func (a typArray) Size() int { return (a.end - a.start) * a.typ.Size() }
 
 type typFunction struct {
 	name string
-	args []pVar
+	args []varId
 	ret  pType
 }
 
@@ -116,7 +124,7 @@ type expConst struct {
 func (e expConst) IsLValue() bool { return false }
 func (e expConst) exprNode()      {}
 
-type expId struct {
+type exvarId struct {
 	name  string
 	byRef bool
 
@@ -124,20 +132,20 @@ type expId struct {
 
 }
 
-func (e expId) IsLValue() bool { return true }
-func (e expId) exprNode()      {}
+func (e exvarId) IsLValue() bool { return true }
+func (e exvarId) exprNode()      {}
 
 type expField struct {
 	e      expr
 	record typRecord
-	field  pVar
+	field  varId
 }
 
 func (e expField) IsLValue() bool { return true }
 func (e expField) exprNode()      {}
 
 type expCall struct {
-	fn   pVar
+	fn   varId
 	args []expr
 }
 
@@ -200,7 +208,7 @@ type stmAssign struct {
 }
 
 type stmCall struct {
-	fn   pVar
+	fn   varId
 	args []expr
 }
 
