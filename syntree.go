@@ -220,6 +220,10 @@ type stmIf struct {
 	ifFalse stmt
 }
 type stmFor struct {
+	counter varId
+	expr1   expr
+	expr2   expr
+	body    stmt
 }
 type stmWhile struct {
 	e    expr

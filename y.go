@@ -809,7 +809,7 @@ yydefault:
 	case 43:
 		//line parser.y:122
 		{
-			yyVAL.stmt = stmFor{}
+			yyVAL.stmt = stmFor{counter: varId{name: yyS[yypt-6].s}, expr1: yyS[yypt-4].expr, expr2: yyS[yypt-2].expr, body: yyS[yypt-0].stmt}
 		}
 	case 44:
 		//line parser.y:123
