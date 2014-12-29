@@ -964,7 +964,7 @@ yydefault:
 	case 74:
 		//line parser.y:159
 		{
-			yyVAL.expr = exvarId{name: yyS[yypt-0].s}
+			yyVAL.expr = expId{name: yyS[yypt-0].s}
 		}
 	case 75:
 		//line parser.y:160

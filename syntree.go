@@ -124,7 +124,7 @@ type expConst struct {
 func (e expConst) IsLValue() bool { return false }
 func (e expConst) exprNode()      {}
 
-type exvarId struct {
+type expId struct {
 	name  string
 	byRef bool
 
@@ -132,8 +132,8 @@ type exvarId struct {
 
 }
 
-func (e exvarId) IsLValue() bool { return true }
-func (e exvarId) exprNode()      {}
+func (e expId) IsLValue() bool { return true }
+func (e expId) exprNode()      {}
 
 type expField struct {
 	e      expr

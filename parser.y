@@ -156,7 +156,7 @@ expr: tID '(' expr_list ')' { $$ = expCall{fn:varId{name:$1}, args: $3} }
     | tQSTRING { $$ = expConst{t:primString, s:$1}; }
     ;
 
-variable: tID { $$ = exvarId{name:$1} }
+variable: tID { $$ = expId{name:$1} }
     | variable '[' expr ']' { $$ = expBinop{op:binArrayIndex, left:$1, right:$3} }
     | variable '.' tID { $$ = expField{e:$1, field:varId{name:$3}} }
     | variable '^' { $$ = expUnop{op:unopPtr, e:$1} }
