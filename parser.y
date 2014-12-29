@@ -21,6 +21,8 @@ import "log"
         decls pDecls
         expr expr
         exprs []expr
+        stmt stmt
+        stmts []stmt
 }
 
 %token <f> tFNUMBER
@@ -45,9 +47,11 @@ import "log"
 %type <function> subprog_decl subprog_head
 %type <exprs> expr_list
 %type <expr> expr variable
+%type <stmt> stmt
+%type <stmts> stmt_list compound_stmt opt_stmts
 %%
 
-pascal_program : tPROGRAM tID ';' decls subprog_decls compound_stmt '.' { log.Printf("%#v", pProgram{name:$2, vars:$4.vars, types:$4.types, subprogs:$5}) } ;
+pascal_program : tPROGRAM tID ';' decls subprog_decls compound_stmt '.' { log.Printf("%#v", pProgram{name:$2, vars:$4.vars, types:$4.types, subprogs:$5, body:$6}) } ;
 
 id_list : id_list ',' tID { $$ = append($1, $3); }
         | tID { $$ = append($$, $1) }
@@ -78,7 +82,7 @@ subprog_decls: subprog_decls subprog_decl { $$ = append($1, $2) }
              | { $$ = nil }/* empty */
              ;
 
-subprog_decl : subprog_head decls compound_stmt ';' { $1.decls = $2.vars; $$ = $1 }
+subprog_decl : subprog_head decls compound_stmt ';' { $1.decls = $2.vars; $1.body = $3; $$ = $1 }
               ;
 
 subprog_head: tFUNCTION tID arguments ':' standard_type ';' { $$ = pFunction{name:$2, args:$3, ret:$5} }
@@ -97,27 +101,27 @@ param_list: tVAR id_list ':' ptype  { for _, id := range $2 { $$ = append($$, pV
           | id_list ':' ptype { for _, id := range $1 { $$ = append($$, pVar{name:id, typ:$3}) } }
           ;
 
-compound_stmt : tBEGIN opt_stmts tEND
+compound_stmt : tBEGIN opt_stmts tEND { $$ = $2 }
 
-opt_stmts : stmt_list
-          | /* empty */
+opt_stmts : stmt_list { $$ = $1 }
+          | /* empty */ { $$ = nil }
           ;
 
-stmt_list : stmt_list stmt ';'
-          | stmt ';'
+stmt_list : stmt_list stmt ';' { $$ = append($1, $2) }
+          | stmt ';' { $$ = []stmt{$1} }
           ;
 
-stmt : variable tASSIGN expr
-     | tBREAK
-     | tCONTINUE
-     | tID '(' expr_list ')'
-     | tID
-     | compound_stmt
-     | tIF expr tTHEN stmt
-     | tIF expr tTHEN stmt tELSE stmt
-     | tFOR tID tASSIGN expr tTO expr tDO stmt
-     | tWHILE expr tDO stmt
-     | tREPEAT stmt_list tUNTIL expr
+stmt : variable tASSIGN expr { $$ = stmAssign{id:$1, e:$3} }
+     | tBREAK { $$ = stmBreak{} }
+     | tCONTINUE { $$ = stmContinue{} }
+     | tID '(' expr_list ')' { $$ = stmCall{fn:pVar{name:$1}, args:$3} }
+     | tID  { $$ = stmCall{fn:pVar{name:$1}} }
+     | compound_stmt { $$ = stmBlock{stmts:$1} }
+     | tIF expr tTHEN stmt { $$ = stmIf{cond:$2, ifTrue:$4} }
+     | tIF expr tTHEN stmt tELSE stmt { $$ = stmIf{cond:$2, ifTrue:$4, ifFalse:$6} }
+     | tFOR tID tASSIGN expr tTO expr tDO stmt { $$ = stmFor{} }
+     | tWHILE expr tDO stmt { $$ = stmWhile{e:$2, body:$4} }
+     | tREPEAT stmt_list tUNTIL expr { $$ = stmRepeat{e:$4, body:$2} }
      ;
 
 expr_list: expr_list ',' expr { $$ = append($1, $3) }

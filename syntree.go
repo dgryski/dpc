@@ -5,6 +5,7 @@ type pProgram struct {
 	vars     []pVar
 	types    []typTypedef
 	subprogs []pFunction
+	body     []stmt
 }
 
 type pVar struct {
@@ -18,6 +19,7 @@ type pFunction struct {
 	args  []pVar
 	ret   pType
 	decls []pVar
+	body  []stmt
 }
 
 type pType interface {
@@ -187,3 +189,49 @@ type expBinop struct {
 
 func (e expBinop) IsLValue() bool { return false }
 func (e expBinop) exprNode()      {}
+
+type stmt interface {
+	stmtNode()
+}
+
+type stmAssign struct {
+	id expr
+	e  expr
+}
+
+type stmCall struct {
+	fn   pVar
+	args []expr
+}
+
+type stmBreak struct{}
+type stmContinue struct{}
+type stmIf struct {
+	cond    expr
+	ifTrue  stmt
+	ifFalse stmt
+}
+type stmFor struct {
+}
+type stmWhile struct {
+	e    expr
+	body stmt
+}
+type stmRepeat struct {
+	e    expr
+	body []stmt
+}
+
+type stmBlock struct {
+	stmts []stmt
+}
+
+func (s stmAssign) stmtNode()   {}
+func (s stmBreak) stmtNode()    {}
+func (s stmCall) stmtNode()     {}
+func (s stmContinue) stmtNode() {}
+func (s stmBlock) stmtNode()    {}
+func (s stmIf) stmtNode()       {}
+func (s stmFor) stmtNode()      {}
+func (s stmWhile) stmtNode()    {}
+func (s stmRepeat) stmtNode()   {}
