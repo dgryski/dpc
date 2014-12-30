@@ -1,7 +1,15 @@
 package main
 
+type varDecl struct {
+	name string
+	typ  pType
+}
+
+func (p varDecl) Name() string { return p.name }
+func (p varDecl) Type() pType  { return p.typ }
+
 type varProgram struct {
-	name     string
+	varDecl
 	vars     []varId
 	types    []typTypedef
 	subprogs []varFunction
@@ -9,17 +17,20 @@ type varProgram struct {
 }
 
 type varId struct {
-	name        string
-	typ         pType
+	varDecl
 	byReference bool
 }
 
 type varFunction struct {
-	name  string
+	varDecl
 	args  []varId
 	ret   varId
 	decls []varId
 	body  stmt
+}
+
+type varType struct {
+	varDecl
 }
 
 type pType interface {
@@ -33,6 +44,8 @@ type pDecls struct {
 }
 
 type pvariable interface {
+	Name() string
+	Type() pType
 	varNode()
 }
 
@@ -147,7 +160,7 @@ func (e expField) IsLValue() bool { return true }
 func (e expField) exprNode()      {}
 
 type expCall struct {
-	fn   varId
+	fn   expId
 	args []expr
 }
 
@@ -210,7 +223,7 @@ type stmAssign struct {
 }
 
 type stmCall struct {
-	fn   varId
+	fn   expId
 	args []expr
 }
 
