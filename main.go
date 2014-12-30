@@ -5,6 +5,7 @@ package main
 
 import (
 	"io/ioutil"
+	"log"
 	"os"
 )
 
@@ -14,5 +15,9 @@ func main() {
 
 	l := pascalLexer(tokens)
 
-	yyParse(&l)
+	if yyParse(&l) != 0 {
+		log.Fatal("parse error")
+	}
+
+	log.Printf("%#v\n", program)
 }

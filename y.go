@@ -4,9 +4,9 @@ package main
 import __yyfmt__ "fmt"
 
 //line parser.y:3
-import "log"
+var program varProgram
 
-//line parser.y:9
+//line parser.y:8
 type yySymType struct {
 	yys int
 	f   float64
@@ -589,395 +589,395 @@ yydefault:
 	switch yynt {
 
 	case 1:
-		//line parser.y:54
+		//line parser.y:53
 		{
-			log.Printf("%#v", varProgram{name: yyS[yypt-5].s, vars: yyS[yypt-3].decls.vars, types: yyS[yypt-3].decls.types, subprogs: yyS[yypt-2].functions, body: yyS[yypt-1].stmt})
+			program = varProgram{name: yyS[yypt-5].s, vars: yyS[yypt-3].decls.vars, types: yyS[yypt-3].decls.types, subprogs: yyS[yypt-2].functions, body: yyS[yypt-1].stmt}
 		}
 	case 2:
-		//line parser.y:56
+		//line parser.y:55
 		{
 			yyVAL.strings = append(yyS[yypt-2].strings, yyS[yypt-0].s)
 		}
 	case 3:
-		//line parser.y:57
+		//line parser.y:56
 		{
 			yyVAL.strings = append(yyVAL.strings, yyS[yypt-0].s)
 		}
 	case 4:
-		//line parser.y:60
+		//line parser.y:59
 		{
 			for _, id := range yyS[yypt-3].strings {
 				yyVAL.decls.vars = append(yyVAL.decls.vars, varId{name: id, typ: yyS[yypt-1].ptyp})
 			}
 		}
 	case 5:
-		//line parser.y:61
+		//line parser.y:60
 		{
 			yyVAL.decls.types = append(yyS[yypt-5].decls.types, typTypedef{name: yyS[yypt-3].s, typ: yyS[yypt-1].ptyp})
 		}
 	case 6:
-		//line parser.y:62
+		//line parser.y:61
 		{
 			yyVAL.decls = pDecls{}
 		}
 	case 7:
-		//line parser.y:65
+		//line parser.y:64
 		{
 			yyVAL.ptyp = yyS[yypt-0].ptyp
 		}
 	case 8:
-		//line parser.y:66
+		//line parser.y:65
 		{
 			yyVAL.ptyp = typTypedef{name: yyS[yypt-0].s}
 		}
 	case 9:
-		//line parser.y:67
+		//line parser.y:66
 		{
 			yyVAL.ptyp = typArray{start: yyS[yypt-5].i, end: yyS[yypt-3].i, typ: yyS[yypt-0].ptyp}
 		}
 	case 10:
-		//line parser.y:68
+		//line parser.y:67
 		{
 			yyVAL.ptyp = typPointer{typ: yyS[yypt-0].ptyp}
 		}
 	case 11:
-		//line parser.y:69
+		//line parser.y:68
 		{
 			yyVAL.ptyp = typRecord{fields: yyS[yypt-2].vars}
 		}
 	case 12:
-		//line parser.y:70
+		//line parser.y:69
 		{
 			yyVAL.ptyp = typVoid{}
 		}
 	case 13:
-		//line parser.y:71
+		//line parser.y:70
 		{
 			yyVAL.ptyp = typVoid{}
 		}
 	case 14:
-		//line parser.y:74
+		//line parser.y:73
 		{
 			yyVAL.ptyp = typPrimitive{primInt}
 		}
 	case 15:
-		//line parser.y:75
+		//line parser.y:74
 		{
 			yyVAL.ptyp = typPrimitive{primReal}
 		}
 	case 16:
-		//line parser.y:76
+		//line parser.y:75
 		{
 			yyVAL.ptyp = typPrimitive{primChar}
 		}
 	case 17:
-		//line parser.y:77
+		//line parser.y:76
 		{
 			yyVAL.ptyp = typPrimitive{primBool}
 		}
 	case 18:
-		//line parser.y:78
+		//line parser.y:77
 		{
 			yyVAL.ptyp = typPrimitive{primString}
 		}
 	case 19:
-		//line parser.y:81
+		//line parser.y:80
 		{
 			yyVAL.functions = append(yyS[yypt-1].functions, yyS[yypt-0].function)
 		}
 	case 20:
-		//line parser.y:82
+		//line parser.y:81
 		{
 			yyVAL.functions = nil
 		}
 	case 21:
-		//line parser.y:85
+		//line parser.y:84
 		{
 			yyS[yypt-3].function.decls = yyS[yypt-2].decls.vars
 			yyS[yypt-3].function.body = yyS[yypt-1].stmt
 			yyVAL.function = yyS[yypt-3].function
 		}
 	case 22:
-		//line parser.y:88
+		//line parser.y:87
 		{
 			yyVAL.function = varFunction{name: yyS[yypt-4].s, args: yyS[yypt-3].vars, ret: varId{typ: yyS[yypt-1].ptyp}}
 		}
 	case 23:
-		//line parser.y:89
+		//line parser.y:88
 		{
 			yyVAL.function = varFunction{name: yyS[yypt-2].s, args: yyS[yypt-1].vars, ret: varId{typ: typVoid{}}}
 		}
 	case 24:
-		//line parser.y:92
+		//line parser.y:91
 		{
 			yyVAL.vars = yyS[yypt-1].vars
 		}
 	case 25:
-		//line parser.y:93
+		//line parser.y:92
 		{
 			yyVAL.vars = nil
 		}
 	case 26:
-		//line parser.y:96
+		//line parser.y:95
 		{
 			yyVAL.vars = append(yyS[yypt-2].vars, yyS[yypt-0].vars...)
 		}
 	case 27:
-		//line parser.y:97
+		//line parser.y:96
 		{
 			yyVAL.vars = yyS[yypt-0].vars
 		}
 	case 28:
-		//line parser.y:100
+		//line parser.y:99
 		{
 			for _, id := range yyS[yypt-2].strings {
 				yyVAL.vars = append(yyVAL.vars, varId{name: id, typ: yyS[yypt-0].ptyp})
 			}
 		}
 	case 29:
-		//line parser.y:101
+		//line parser.y:100
 		{
 			for _, id := range yyS[yypt-2].strings {
 				yyVAL.vars = append(yyVAL.vars, varId{name: id, typ: yyS[yypt-0].ptyp})
 			}
 		}
 	case 30:
-		//line parser.y:104
+		//line parser.y:103
 		{
 			yyVAL.stmt = stmBlock{stmts: yyS[yypt-1].stmts}
 		}
 	case 31:
-		//line parser.y:106
+		//line parser.y:105
 		{
 			yyVAL.stmts = yyS[yypt-0].stmts
 		}
 	case 32:
-		//line parser.y:107
+		//line parser.y:106
 		{
 			yyVAL.stmts = nil
 		}
 	case 33:
-		//line parser.y:110
+		//line parser.y:109
 		{
 			yyVAL.stmts = append(yyS[yypt-2].stmts, yyS[yypt-1].stmt)
 		}
 	case 34:
-		//line parser.y:111
+		//line parser.y:110
 		{
 			yyVAL.stmts = []stmt{yyS[yypt-1].stmt}
 		}
 	case 35:
-		//line parser.y:114
+		//line parser.y:113
 		{
 			yyVAL.stmt = stmAssign{id: yyS[yypt-2].expr, e: yyS[yypt-0].expr}
 		}
 	case 36:
-		//line parser.y:115
+		//line parser.y:114
 		{
 			yyVAL.stmt = stmBreak{}
 		}
 	case 37:
-		//line parser.y:116
+		//line parser.y:115
 		{
 			yyVAL.stmt = stmContinue{}
 		}
 	case 38:
-		//line parser.y:117
+		//line parser.y:116
 		{
 			yyVAL.stmt = stmCall{fn: varId{name: yyS[yypt-3].s}, args: yyS[yypt-1].exprs}
 		}
 	case 39:
-		//line parser.y:118
+		//line parser.y:117
 		{
 			yyVAL.stmt = stmCall{fn: varId{name: yyS[yypt-0].s}}
 		}
 	case 40:
-		//line parser.y:119
+		//line parser.y:118
 		{
 			yyVAL.stmt = yyS[yypt-0].stmt
 		}
 	case 41:
-		//line parser.y:120
+		//line parser.y:119
 		{
 			yyVAL.stmt = stmIf{cond: yyS[yypt-2].expr, ifTrue: yyS[yypt-0].stmt}
 		}
 	case 42:
-		//line parser.y:121
+		//line parser.y:120
 		{
 			yyVAL.stmt = stmIf{cond: yyS[yypt-4].expr, ifTrue: yyS[yypt-2].stmt, ifFalse: yyS[yypt-0].stmt}
 		}
 	case 43:
-		//line parser.y:122
+		//line parser.y:121
 		{
 			yyVAL.stmt = stmFor{counter: expId{name: yyS[yypt-6].s}, expr1: yyS[yypt-4].expr, expr2: yyS[yypt-2].expr, body: yyS[yypt-0].stmt}
 		}
 	case 44:
-		//line parser.y:123
+		//line parser.y:122
 		{
 			yyVAL.stmt = stmWhile{e: yyS[yypt-2].expr, body: yyS[yypt-0].stmt}
 		}
 	case 45:
-		//line parser.y:124
+		//line parser.y:123
 		{
 			yyVAL.stmt = stmRepeat{e: yyS[yypt-0].expr, body: stmBlock{yyS[yypt-2].stmts}}
 		}
 	case 46:
-		//line parser.y:127
+		//line parser.y:126
 		{
 			yyVAL.exprs = append(yyS[yypt-2].exprs, yyS[yypt-0].expr)
 		}
 	case 47:
-		//line parser.y:128
+		//line parser.y:127
 		{
 			yyVAL.exprs = []expr{yyS[yypt-0].expr}
 		}
 	case 48:
-		//line parser.y:131
+		//line parser.y:130
 		{
 			yyVAL.expr = expCall{fn: varId{name: yyS[yypt-3].s}, args: yyS[yypt-1].exprs}
 		}
 	case 49:
-		//line parser.y:132
+		//line parser.y:131
 		{
 			yyVAL.expr = expUnop{op: unopAt, e: yyS[yypt-0].expr}
 		}
 	case 50:
-		//line parser.y:133
+		//line parser.y:132
 		{
 			yyVAL.expr = expUnop{op: unopPlus, e: yyS[yypt-0].expr}
 		}
 	case 51:
-		//line parser.y:134
+		//line parser.y:133
 		{
 			yyVAL.expr = expUnop{op: unopMinus, e: yyS[yypt-0].expr}
 		}
 	case 52:
-		//line parser.y:135
+		//line parser.y:134
 		{
 			yyVAL.expr = yyS[yypt-0].expr
 		}
 	case 53:
-		//line parser.y:136
+		//line parser.y:135
 		{
 			yyVAL.expr = expBinop{op: binAND, left: yyS[yypt-2].expr, right: yyS[yypt-0].expr}
 		}
 	case 54:
-		//line parser.y:137
+		//line parser.y:136
 		{
 			yyVAL.expr = expBinop{op: binDIV, left: yyS[yypt-2].expr, right: yyS[yypt-0].expr}
 		}
 	case 55:
-		//line parser.y:138
+		//line parser.y:137
 		{
 			yyVAL.expr = expBinop{op: binLT, left: yyS[yypt-2].expr, right: yyS[yypt-0].expr}
 		}
 	case 56:
-		//line parser.y:139
+		//line parser.y:138
 		{
 			yyVAL.expr = expBinop{op: binEQ, left: yyS[yypt-2].expr, right: yyS[yypt-0].expr}
 		}
 	case 57:
-		//line parser.y:140
+		//line parser.y:139
 		{
 			yyVAL.expr = expBinop{op: binGT, left: yyS[yypt-2].expr, right: yyS[yypt-0].expr}
 		}
 	case 58:
-		//line parser.y:141
+		//line parser.y:140
 		{
 			yyVAL.expr = expBinop{op: binSUB, left: yyS[yypt-2].expr, right: yyS[yypt-0].expr}
 		}
 	case 59:
-		//line parser.y:142
+		//line parser.y:141
 		{
 			yyVAL.expr = expBinop{op: binFDIV, left: yyS[yypt-2].expr, right: yyS[yypt-0].expr}
 		}
 	case 60:
-		//line parser.y:143
+		//line parser.y:142
 		{
 			yyVAL.expr = expBinop{op: binMUL, left: yyS[yypt-2].expr, right: yyS[yypt-0].expr}
 		}
 	case 61:
-		//line parser.y:144
+		//line parser.y:143
 		{
 			yyVAL.expr = expBinop{op: binADD, left: yyS[yypt-2].expr, right: yyS[yypt-0].expr}
 		}
 	case 62:
-		//line parser.y:145
+		//line parser.y:144
 		{
 			yyVAL.expr = expBinop{op: binGE, left: yyS[yypt-2].expr, right: yyS[yypt-0].expr}
 		}
 	case 63:
-		//line parser.y:146
+		//line parser.y:145
 		{
 			yyVAL.expr = expBinop{op: binLE, left: yyS[yypt-2].expr, right: yyS[yypt-0].expr}
 		}
 	case 64:
-		//line parser.y:147
+		//line parser.y:146
 		{
 			yyVAL.expr = expBinop{op: binMOD, left: yyS[yypt-2].expr, right: yyS[yypt-0].expr}
 		}
 	case 65:
-		//line parser.y:148
+		//line parser.y:147
 		{
 			yyVAL.expr = expBinop{op: binNE, left: yyS[yypt-2].expr, right: yyS[yypt-0].expr}
 		}
 	case 66:
-		//line parser.y:149
+		//line parser.y:148
 		{
 			yyVAL.expr = expBinop{op: binOR, left: yyS[yypt-2].expr, right: yyS[yypt-0].expr}
 		}
 	case 67:
-		//line parser.y:150
+		//line parser.y:149
 		{
 			yyVAL.expr = yyS[yypt-1].expr
 		}
 	case 68:
-		//line parser.y:151
+		//line parser.y:150
 		{
 			yyVAL.expr = expUnop{op: unopNot, e: yyS[yypt-0].expr}
 		}
 	case 69:
-		//line parser.y:152
+		//line parser.y:151
 		{
 			yyVAL.expr = expConst{t: primInt, i: yyS[yypt-0].i}
 		}
 	case 70:
-		//line parser.y:153
+		//line parser.y:152
 		{
 			yyVAL.expr = expConst{t: primReal, f: yyS[yypt-0].f}
 		}
 	case 71:
-		//line parser.y:154
+		//line parser.y:153
 		{
 			yyVAL.expr = expConst{t: primBool, b: true}
 		}
 	case 72:
-		//line parser.y:155
+		//line parser.y:154
 		{
 			yyVAL.expr = expConst{t: primBool, b: false}
 		}
 	case 73:
-		//line parser.y:156
+		//line parser.y:155
 		{
 			yyVAL.expr = expConst{t: primString, s: yyS[yypt-0].s}
 		}
 	case 74:
-		//line parser.y:159
+		//line parser.y:158
 		{
 			yyVAL.expr = expId{name: yyS[yypt-0].s}
 		}
 	case 75:
-		//line parser.y:160
+		//line parser.y:159
 		{
 			yyVAL.expr = expBinop{op: binArrayIndex, left: yyS[yypt-3].expr, right: yyS[yypt-1].expr}
 		}
 	case 76:
-		//line parser.y:161
+		//line parser.y:160
 		{
 			yyVAL.expr = expField{e: yyS[yypt-2].expr, field: varId{name: yyS[yypt-0].s}}
 		}
 	case 77:
-		//line parser.y:162
+		//line parser.y:161
 		{
 			yyVAL.expr = expUnop{op: unopPtr, e: yyS[yypt-1].expr}
 		}

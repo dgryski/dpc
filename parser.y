@@ -2,8 +2,7 @@
 
 package main
 
-import "log"
-
+var program varProgram
 %}
 
 %union{
@@ -51,7 +50,7 @@ import "log"
 %type <stmts> stmt_list opt_stmts
 %%
 
-pascal_program : tPROGRAM tID ';' decls subprog_decls compound_stmt '.' { log.Printf("%#v", varProgram{name:$2, vars:$4.vars, types:$4.types, subprogs:$5, body:$6}) } ;
+pascal_program : tPROGRAM tID ';' decls subprog_decls compound_stmt '.' { program = varProgram{name:$2, vars:$4.vars, types:$4.types, subprogs:$5, body:$6} } ;
 
 id_list : id_list ',' tID { $$ = append($1, $3); }
         | tID { $$ = append($$, $1) }
