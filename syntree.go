@@ -100,6 +100,8 @@ type typFunction struct {
 	ret  pType
 }
 
+func (f typFunction) Size() int { return 8 }
+
 type typTypedef struct {
 	name string
 	typ  pType
