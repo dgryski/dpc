@@ -10,13 +10,13 @@ var program varProgram
         i int
         s string
 
-        vars []varId
-        typedefs []typTypedef
+        vars []*varId
+        typedefs []*typTypedef
         strings []string
         ptyp pType
         program varProgram
-        functions []varFunction
-        function varFunction
+        functions []*varFunction
+        function *varFunction
         decls pDecls
         expr expr
         exprs []expr
@@ -56,8 +56,8 @@ id_list : id_list ',' tID { $$ = append($1, $3); }
         | tID { $$ = append($$, $1) }
         ;
 
-decls: decls tVAR id_list ':' ptype ';' { for _, id := range $3 { $$.vars = append($$.vars, varId{varDecl:varDecl{name:id, typ:$5}}) } }
-     | decls tTYPE tID '=' ptype ';' { $$.types = append($1.types, typTypedef{name:$3, typ:$5}) }
+decls: decls tVAR id_list ':' ptype ';' { for _, id := range $3 { $$.vars = append($$.vars, &varId{varDecl:varDecl{name:id, typ:$5}}) } }
+     | decls tTYPE tID '=' ptype ';' { $$.types = append($1.types, &typTypedef{name:$3, typ:$5}) }
      | { $$ = pDecls{} } /* empty */
      ;
 
@@ -85,23 +85,23 @@ subprog_decl : subprog_head decls compound_stmt ';' { $1.decls = $2.vars; $1.bod
               ;
 
 subprog_head: tFUNCTION tID arguments ':' standard_type ';' {
-                $$ = varFunction{
+                $$ = &varFunction{
                     varDecl:varDecl{
                         name:$2,
                         typ: typFunction{name:$2, args:$3, ret:$5},
                     },
                     args:$3,
-                    ret: varId{varDecl:varDecl{typ:$5}},
+                    ret: &varId{varDecl:varDecl{typ:$5}},
                 }
             }
             | tPROCEDURE tID arguments ';' {
-                $$ = varFunction{
+                $$ = &varFunction{
                     varDecl:varDecl{
                         name:$2,
                         typ:typFunction{name:$2, args:$3, ret:typVoid{}},
                     },
                     args:$3,
-                    ret:varId{varDecl:varDecl{typ:typVoid{}}},
+                    ret:&varId{varDecl:varDecl{typ:typVoid{}}},
                 }
             }
             ;
@@ -114,11 +114,11 @@ param_list_list: param_list_list ';' param_list { $$ = append($1, $3...) }
                | param_list { $$ = $1 }
                ;
 
-param_list: tVAR id_list ':' ptype  { for _, id := range $2 { $$ = append($$, varId{varDecl:varDecl{name:id, typ:$4}}) } }
-          | id_list ':' ptype { for _, id := range $1 { $$ = append($$, varId{varDecl:varDecl{name:id, typ:$3}}) } }
+param_list: tVAR id_list ':' ptype  { for _, id := range $2 { $$ = append($$, &varId{varDecl:varDecl{name:id, typ:$4}}) } }
+          | id_list ':' ptype { for _, id := range $1 { $$ = append($$, &varId{varDecl:varDecl{name:id, typ:$3}}) } }
           ;
 
-compound_stmt : tBEGIN opt_stmts tEND { $$ = stmBlock{stmts:$2} }
+compound_stmt : tBEGIN opt_stmts tEND { $$ = &stmBlock{stmts:$2} }
 
 opt_stmts : stmt_list { $$ = $1 }
           | /* empty */ { $$ = nil }
@@ -128,53 +128,53 @@ stmt_list : stmt_list stmt ';' { $$ = append($1, $2) }
           | stmt ';' { $$ = []stmt{$1} }
           ;
 
-stmt : variable tASSIGN expr { $$ = stmAssign{id:$1, e:$3} }
-     | tBREAK { $$ = stmBreak{} }
-     | tCONTINUE { $$ = stmContinue{} }
-     | tID '(' expr_list ')' { $$ = stmCall{fn:expId{name:$1}, args:$3} }
-     | tID  { $$ = stmCall{fn:expId{name:$1}} }
+stmt : variable tASSIGN expr { $$ = &stmAssign{id:$1, e:$3} }
+     | tBREAK { $$ = &stmBreak{} }
+     | tCONTINUE { $$ = &stmContinue{} }
+     | tID '(' expr_list ')' { $$ = &stmCall{fn:&expId{name:$1}, args:$3} }
+     | tID  { $$ = &stmCall{fn:&expId{name:$1}} }
      | compound_stmt { $$ = $1 }
-     | tIF expr tTHEN stmt { $$ = stmIf{cond:$2, ifTrue:$4} }
-     | tIF expr tTHEN stmt tELSE stmt { $$ = stmIf{cond:$2, ifTrue:$4, ifFalse:$6} }
-     | tFOR tID tASSIGN expr tTO expr tDO stmt { $$ = stmFor{counter:expId{name:$2}, expr1:$4, expr2:$6, body:$8} }
-     | tWHILE expr tDO stmt { $$ = stmWhile{e:$2, body:$4} }
-     | tREPEAT stmt_list tUNTIL expr { $$ = stmRepeat{e:$4, body:stmBlock{$2}} }
+     | tIF expr tTHEN stmt { $$ = &stmIf{cond:$2, ifTrue:$4} }
+     | tIF expr tTHEN stmt tELSE stmt { $$ = &stmIf{cond:$2, ifTrue:$4, ifFalse:$6} }
+     | tFOR tID tASSIGN expr tTO expr tDO stmt { $$ = &stmFor{counter:&expId{name:$2}, expr1:$4, expr2:$6, body:$8} }
+     | tWHILE expr tDO stmt { $$ = &stmWhile{e:$2, body:$4} }
+     | tREPEAT stmt_list tUNTIL expr { $$ = &stmRepeat{e:$4, body:&stmBlock{$2}} }
      ;
 
 expr_list: expr_list ',' expr { $$ = append($1, $3) }
          | expr { $$ = []expr{$1} }
          ;
 
-expr: tID '(' expr_list ')' { $$ = expCall{fn:expId{name:$1}, args: $3} }
-    | '@' variable { $$ = expUnop{op:unopAt, e:$2} }
-    | '+' expr %prec UMINUS { $$ = expUnop{op:unopPlus, e:$2} }
-    | '-' expr %prec UMINUS { $$ = expUnop{op:unopMinus,  e:$2} }
+expr: tID '(' expr_list ')' { $$ = &expCall{fn:&expId{name:$1}, args: $3} }
+    | '@' variable { $$ = &expUnop{op:unopAt, e:$2} }
+    | '+' expr %prec UMINUS { $$ = &expUnop{op:unopPlus, e:$2} }
+    | '-' expr %prec UMINUS { $$ = &expUnop{op:unopMinus,  e:$2} }
     | variable { $$ = $1 }
-    | expr tAND expr { $$ = expBinop{op:binAND, left:$1, right: $3} }
-    | expr tDIV expr { $$ = expBinop{op:binDIV, left:$1, right: $3} }
-    | expr '<' expr { $$ = expBinop{op:binLT, left:$1, right: $3} }
-    | expr '=' expr { $$ = expBinop{op:binEQ, left:$1, right: $3} }
-    | expr '>' expr { $$ = expBinop{op:binGT, left:$1, right: $3} }
-    | expr '-' expr { $$ = expBinop{op:binSUB, left:$1, right: $3} }
-    | expr '/' expr { $$ = expBinop{op:binFDIV, left:$1, right: $3} }
-    | expr '*' expr { $$ = expBinop{op:binMUL, left:$1, right: $3} }
-    | expr '+' expr { $$ = expBinop{op:binADD, left:$1, right: $3} }
-    | expr tGE expr { $$ = expBinop{op:binGE, left:$1, right: $3} }
-    | expr tLE expr { $$ = expBinop{op:binLE, left:$1, right: $3} }
-    | expr tMOD expr { $$ = expBinop{op:binMOD, left:$1, right: $3} }
-    | expr tNE expr { $$ = expBinop{op:binNE, left:$1, right: $3} }
-    | expr tOR expr { $$ = expBinop{op:binOR, left:$1, right: $3} }
+    | expr tAND expr { $$ = &expBinop{op:binAND, left:$1, right: $3} }
+    | expr tDIV expr { $$ = &expBinop{op:binDIV, left:$1, right: $3} }
+    | expr '<' expr { $$ = &expBinop{op:binLT, left:$1, right: $3} }
+    | expr '=' expr { $$ = &expBinop{op:binEQ, left:$1, right: $3} }
+    | expr '>' expr { $$ = &expBinop{op:binGT, left:$1, right: $3} }
+    | expr '-' expr { $$ = &expBinop{op:binSUB, left:$1, right: $3} }
+    | expr '/' expr { $$ = &expBinop{op:binFDIV, left:$1, right: $3} }
+    | expr '*' expr { $$ = &expBinop{op:binMUL, left:$1, right: $3} }
+    | expr '+' expr { $$ = &expBinop{op:binADD, left:$1, right: $3} }
+    | expr tGE expr { $$ = &expBinop{op:binGE, left:$1, right: $3} }
+    | expr tLE expr { $$ = &expBinop{op:binLE, left:$1, right: $3} }
+    | expr tMOD expr { $$ = &expBinop{op:binMOD, left:$1, right: $3} }
+    | expr tNE expr { $$ = &expBinop{op:binNE, left:$1, right: $3} }
+    | expr tOR expr { $$ = &expBinop{op:binOR, left:$1, right: $3} }
     | '(' expr ')' { $$ = $2 }
-    | tNOT expr { $$ = expUnop{op:unopNot, e:$2} }
-    | tNUMBER { $$ = expConst{t:primInt, i:$1} }
-    | tFNUMBER { $$ = expConst{t:primReal, f:$1} }
-    | tTRUE { $$ = expConst{t:primBool, b:true} }
-    | tFALSE { $$ = expConst{t:primBool, b:false} }
-    | tQSTRING { $$ = expConst{t:primString, s:$1}; }
+    | tNOT expr { $$ = &expUnop{op:unopNot, e:$2} }
+    | tNUMBER { $$ = &expConst{t:primInt, i:$1} }
+    | tFNUMBER { $$ = &expConst{t:primReal, f:$1} }
+    | tTRUE { $$ = &expConst{t:primBool, b:true} }
+    | tFALSE { $$ = &expConst{t:primBool, b:false} }
+    | tQSTRING { $$ = &expConst{t:primString, s:$1}; }
     ;
 
-variable: tID { $$ = expId{name:$1} }
-    | variable '[' expr ']' { $$ = expBinop{op:binArrayIndex, left:$1, right:$3} }
-    | variable '.' tID { $$ = expField{e:$1, field:varId{varDecl:varDecl{name:$3}}} }
-    | variable '^' { $$ = expUnop{op:unopPtr, e:$1} }
+variable: tID { $$ = &expId{name:$1} }
+    | variable '[' expr ']' { $$ = &expBinop{op:binArrayIndex, left:$1, right:$3} }
+    | variable '.' tID { $$ = &expField{e:$1, field:&varId{varDecl:varDecl{name:$3}}} }
+    | variable '^' { $$ = &expUnop{op:unopPtr, e:$1} }
     ;

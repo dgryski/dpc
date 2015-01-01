@@ -5,14 +5,14 @@ type varDecl struct {
 	typ  pType
 }
 
-func (p varDecl) Name() string { return p.name }
-func (p varDecl) Type() pType  { return p.typ }
+func (p *varDecl) Name() string { return p.name }
+func (p *varDecl) Type() pType  { return p.typ }
 
 type varProgram struct {
 	varDecl
-	vars     []varId
-	types    []typTypedef
-	subprogs []varFunction
+	vars     []*varId
+	types    []*typTypedef
+	subprogs []*varFunction
 	body     stmt
 }
 
@@ -23,9 +23,9 @@ type varId struct {
 
 type varFunction struct {
 	varDecl
-	args  []varId
-	ret   varId
-	decls []varId
+	args  []*varId
+	ret   *varId
+	decls []*varId
 	body  stmt
 }
 
@@ -39,8 +39,8 @@ type pType interface {
 }
 
 type pDecls struct {
-	vars  []varId
-	types []typTypedef
+	vars  []*varId
+	types []*typTypedef
 }
 
 type pvariable interface {
@@ -49,9 +49,9 @@ type pvariable interface {
 	varNode()
 }
 
-func (p varProgram) varNode()  {}
-func (p varId) varNode()       {}
-func (p varFunction) varNode() {}
+func (p *varProgram) varNode()  {}
+func (p *varId) varNode()       {}
+func (p *varFunction) varNode() {}
 
 type Primitive int
 
@@ -83,7 +83,7 @@ type typPrimitive struct {
 func (p typPrimitive) Size() int { return 8 }
 
 type typRecord struct {
-	fields []varId
+	fields []*varId
 }
 
 func (r typRecord) Size() int {
@@ -109,7 +109,7 @@ func (a typArray) Size() int { return (a.end - a.start) * a.typ.Size() }
 
 type typFunction struct {
 	name string
-	args []varId
+	args []*varId
 	ret  pType
 }
 
@@ -136,36 +136,35 @@ type expConst struct {
 	t Primitive
 }
 
-func (e expConst) IsLValue() bool { return false }
-func (e expConst) exprNode()      {}
+func (e *expConst) IsLValue() bool { return false }
+func (e *expConst) exprNode()      {}
 
 type expId struct {
 	name  string
 	byRef bool
 
-	// bound
-
+	bound pvariable
 }
 
-func (e expId) IsLValue() bool { return true }
-func (e expId) exprNode()      {}
+func (e *expId) IsLValue() bool { return true }
+func (e *expId) exprNode()      {}
 
 type expField struct {
 	e      expr
 	record typRecord
-	field  varId
+	field  *varId
 }
 
-func (e expField) IsLValue() bool { return true }
-func (e expField) exprNode()      {}
+func (e *expField) IsLValue() bool { return true }
+func (e *expField) exprNode()      {}
 
 type expCall struct {
-	fn   expId
+	fn   *expId
 	args []expr
 }
 
-func (e expCall) IsLValue() bool { return true }
-func (e expCall) exprNode()      {}
+func (e *expCall) IsLValue() bool { return true }
+func (e *expCall) exprNode()      {}
 
 type unop byte
 
@@ -182,8 +181,8 @@ type expUnop struct {
 	e  expr
 }
 
-func (e expUnop) IsLValue() bool { return e.op == unopPtr }
-func (e expUnop) exprNode()      {}
+func (e *expUnop) IsLValue() bool { return e.op == unopPtr }
+func (e *expUnop) exprNode()      {}
 
 type binop byte
 
@@ -210,8 +209,8 @@ type expBinop struct {
 	left, right expr
 }
 
-func (e expBinop) IsLValue() bool { return false }
-func (e expBinop) exprNode()      {}
+func (e *expBinop) IsLValue() bool { return false }
+func (e *expBinop) exprNode()      {}
 
 type stmt interface {
 	stmtNode()
@@ -223,7 +222,7 @@ type stmAssign struct {
 }
 
 type stmCall struct {
-	fn   expId
+	fn   *expId
 	args []expr
 }
 
@@ -235,7 +234,7 @@ type stmIf struct {
 	ifFalse stmt
 }
 type stmFor struct {
-	counter expId
+	counter *expId
 	expr1   expr
 	expr2   expr
 	body    stmt
@@ -253,12 +252,12 @@ type stmBlock struct {
 	stmts []stmt
 }
 
-func (s stmAssign) stmtNode()   {}
-func (s stmBreak) stmtNode()    {}
-func (s stmCall) stmtNode()     {}
-func (s stmContinue) stmtNode() {}
-func (s stmBlock) stmtNode()    {}
-func (s stmIf) stmtNode()       {}
-func (s stmFor) stmtNode()      {}
-func (s stmWhile) stmtNode()    {}
-func (s stmRepeat) stmtNode()   {}
+func (s *stmAssign) stmtNode()   {}
+func (s *stmBreak) stmtNode()    {}
+func (s *stmCall) stmtNode()     {}
+func (s *stmContinue) stmtNode() {}
+func (s *stmBlock) stmtNode()    {}
+func (s *stmIf) stmtNode()       {}
+func (s *stmFor) stmtNode()      {}
+func (s *stmWhile) stmtNode()    {}
+func (s *stmRepeat) stmtNode()   {}
