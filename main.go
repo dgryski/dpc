@@ -4,8 +4,8 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 
 	"github.com/davecgh/go-spew/spew"
@@ -18,8 +18,9 @@ func main() {
 	l := pascalLexer(tokens)
 
 	if yyParse(&l) != 0 {
-		log.Fatal("parse error")
+		fmt.Println("parse error")
+		return
 	}
 
-	log.Println(spew.Sdump(program))
+	fmt.Println(spew.Sdump(program))
 }
