@@ -77,7 +77,7 @@ func (_ typVoid) typeNode()      {}
 func (_ typTypedef) typeNode()   {}
 
 type typPrimitive struct {
-	primtType Primitive
+	primType Primitive
 }
 
 func (p typPrimitive) Size() int { return 8 }
