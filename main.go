@@ -7,6 +7,8 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+
+	"github.com/davecgh/go-spew/spew"
 )
 
 func main() {
@@ -19,5 +21,5 @@ func main() {
 		log.Fatal("parse error")
 	}
 
-	log.Printf("%#v\n", program)
+	log.Println(spew.Sdump(program))
 }
