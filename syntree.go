@@ -124,6 +124,7 @@ func (t typTypedef) Size() int { return t.typ.Size() }
 
 type expr interface {
 	IsLValue() bool
+	Type() pType
 	exprNode()
 }
 
@@ -134,9 +135,12 @@ type expConst struct {
 	b bool
 
 	t Primitive
+
+	typ pType
 }
 
 func (e *expConst) IsLValue() bool { return false }
+func (e *expConst) Type() pType    { return e.typ }
 func (e *expConst) exprNode()      {}
 
 type expId struct {
@@ -144,26 +148,34 @@ type expId struct {
 	byRef bool
 
 	bound pvariable
+	typ   pType
 }
 
 func (e *expId) IsLValue() bool { return true }
+func (e *expId) Type() pType    { return e.typ }
 func (e *expId) exprNode()      {}
 
 type expField struct {
 	e      expr
 	record typRecord
 	field  *varId
+
+	typ pType
 }
 
 func (e *expField) IsLValue() bool { return true }
+func (e *expField) Type() pType    { return e.typ }
 func (e *expField) exprNode()      {}
 
 type expCall struct {
 	fn   *expId
 	args []expr
+
+	typ pType
 }
 
 func (e *expCall) IsLValue() bool { return true }
+func (e *expCall) Type() pType    { return e.typ }
 func (e *expCall) exprNode()      {}
 
 type unop byte
@@ -174,14 +186,18 @@ const (
 	unopAt
 	unopMinus
 	unopPlus
+	unopIntToReal
 )
 
 type expUnop struct {
 	op unop
 	e  expr
+
+	typ pType
 }
 
 func (e *expUnop) IsLValue() bool { return e.op == unopPtr }
+func (e *expUnop) Type() pType    { return e.typ }
 func (e *expUnop) exprNode()      {}
 
 type binop byte
@@ -207,9 +223,12 @@ const (
 type expBinop struct {
 	op          binop
 	left, right expr
+
+	typ pType
 }
 
 func (e *expBinop) IsLValue() bool { return false }
+func (e *expBinop) Type() pType    { return e.typ }
 func (e *expBinop) exprNode()      {}
 
 type stmt interface {
