@@ -117,7 +117,6 @@ func bindExpr(e expr, scope scopes) {
 		bindExpr(e.left, scope)
 		bindExpr(e.right, scope)
 	case *expCall:
-		// TODO(dgryski): e.fn -> e.name
 		bindExpr(e.fn, scope)
 		for _, arg := range e.args {
 			bindExpr(arg, scope)
