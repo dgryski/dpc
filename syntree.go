@@ -53,10 +53,10 @@ func (p *varProgram) varNode()  {}
 func (p *varId) varNode()       {}
 func (p *varFunction) varNode() {}
 
-type Primitive int
+type primitive int
 
 const (
-	primInt Primitive = iota
+	primInt primitive = iota
 	primBool
 	primReal
 	primString
@@ -77,7 +77,7 @@ func (_ typVoid) typeNode()      {}
 func (_ typTypedef) typeNode()   {}
 
 type typPrimitive struct {
-	primType Primitive
+	primType primitive
 }
 
 func (p typPrimitive) Size() int { return 8 }
@@ -134,7 +134,7 @@ type expConst struct {
 	s string
 	b bool
 
-	t Primitive
+	t primitive
 
 	typ pType
 }
