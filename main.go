@@ -22,5 +22,7 @@ func main() {
 		return
 	}
 
+	bind(program)
+
 	fmt.Println(spew.Sdump(program))
 }
