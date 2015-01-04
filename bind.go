@@ -116,7 +116,6 @@ func bindExpr(e expr, scope scopes) {
 	case *expBinop:
 		bindExpr(e.left, scope)
 		bindExpr(e.right, scope)
-	// case expArrayIndex: TODO(dgryski): missing
 	case *expCall:
 		// TODO(dgryski): e.fn -> e.name
 		bindExpr(e.fn, scope)
