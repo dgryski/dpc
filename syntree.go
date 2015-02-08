@@ -55,6 +55,7 @@ func (p *varFunction) varNode() {}
 
 type primitive int
 
+//go:generate stringer -type=primitive
 const (
 	primInt primitive = iota
 	primBool
@@ -180,6 +181,7 @@ func (e *expCall) exprNode()      {}
 
 type unop byte
 
+//go:generate stringer -type=unop
 const (
 	unopNot unop = iota
 	unopPtr
@@ -202,6 +204,7 @@ func (e *expUnop) exprNode()      {}
 
 type binop byte
 
+//go:generate stringer -type=binop
 const (
 	binAND binop = iota
 	binDIV
