@@ -145,8 +145,7 @@ func (e *expConst) Type() pType    { return e.typ }
 func (e *expConst) exprNode()      {}
 
 type expId struct {
-	name  string
-	byRef bool
+	name string
 
 	bound pvariable
 	typ   pType
@@ -158,8 +157,8 @@ func (e *expId) exprNode()      {}
 
 type expField struct {
 	e      expr
+	field  *expId
 	record typRecord
-	field  *varId
 
 	typ pType
 }

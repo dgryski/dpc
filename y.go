@@ -988,7 +988,7 @@ yydefault:
 	case 76:
 		//line parser.y:178
 		{
-			yyVAL.expr = &expField{e: yyS[yypt-2].expr, field: &varId{varDecl: varDecl{name: yyS[yypt-0].s}}}
+			yyVAL.expr = &expField{e: yyS[yypt-2].expr, field: &expId{name: yyS[yypt-0].s}}
 		}
 	case 77:
 		//line parser.y:179
