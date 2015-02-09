@@ -124,8 +124,7 @@ func bindExpr(e expr, scope scopes) {
 	case *expUnop:
 		bindExpr(e.e, scope)
 	case *expField:
-		// TODO(dgryski): what goes here?
-		// bindExpr(e.record, scope)
+		bindExpr(e.e, scope)
 	default:
 		panic("unknown expr: " + fmt.Sprintf("%T", e))
 	}
