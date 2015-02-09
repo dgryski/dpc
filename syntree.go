@@ -230,7 +230,7 @@ type expBinop struct {
 	typ pType
 }
 
-func (e *expBinop) IsLValue() bool { return false }
+func (e *expBinop) IsLValue() bool { return e.op == binArrayIndex }
 func (e *expBinop) Type() pType    { return e.typ }
 func (e *expBinop) exprNode()      {}
 
