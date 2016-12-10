@@ -69,13 +69,13 @@ type typVoid struct {
 
 func (v typVoid) Size() int { return 0 }
 
-func (_ typArray) typeNode()     {}
-func (_ typFunction) typeNode()  {}
-func (_ typPrimitive) typeNode() {}
-func (_ typPointer) typeNode()   {}
-func (_ typRecord) typeNode()    {}
-func (_ typVoid) typeNode()      {}
-func (_ typTypedef) typeNode()   {}
+func (typArray) typeNode()     {}
+func (typFunction) typeNode()  {}
+func (typPrimitive) typeNode() {}
+func (typPointer) typeNode()   {}
+func (typRecord) typeNode()    {}
+func (typVoid) typeNode()      {}
+func (typTypedef) typeNode()   {}
 
 type typPrimitive struct {
 	primType primitive
