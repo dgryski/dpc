@@ -115,7 +115,7 @@ func typecheckExpr(e expr) {
 	}
 }
 
-func typecheckCallExpr(expr expr) {
+func typecheckCallExpr(expr *expCall) {
 	// TODO(dgryski): typecheckCallExpr
 }
 
