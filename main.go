@@ -23,6 +23,6 @@ func main() {
 	}
 
 	bind(program)
-
+	typecheck(program)
 	fmt.Println(spew.Sdump(program))
 }
