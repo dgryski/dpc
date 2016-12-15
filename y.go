@@ -73,7 +73,10 @@ const tVAR = 57388
 const tWHILE = 57389
 const UMINUS = 57390
 
-var yyToknames = []string{
+var yyToknames = [...]string{
+	"$end",
+	"error",
+	"$unk",
 	"tFNUMBER",
 	"tNUMBER",
 	"tID",
@@ -126,15 +129,25 @@ var yyToknames = []string{
 	"'*'",
 	"'/'",
 	"UMINUS",
+	"';'",
+	"'.'",
+	"','",
+	"':'",
+	"'['",
+	"']'",
+	"'^'",
+	"'('",
+	"')'",
+	"'@'",
 }
-var yyStatenames = []string{}
+var yyStatenames = [...]string{}
 
 const yyEofCode = 1
 const yyErrCode = 2
-const yyMaxDepth = 200
+const yyInitialStackSize = 16
 
 //line yacctab:1
-var yyExca = []int{
+var yyExca = [...]int{
 	-1, 1,
 	1, -1,
 	-2, 0,
@@ -200,7 +213,7 @@ var yyStates []string
 
 const yyLast = 444
 
-var yyAct = []int{
+var yyAct = [...]int{
 
 	85, 67, 66, 114, 116, 84, 62, 127, 127, 113,
 	150, 63, 15, 158, 126, 50, 21, 40, 149, 42,
@@ -248,7 +261,7 @@ var yyAct = []int{
 	0, 0, 0, 0, 0, 30, 0, 0, 0, 0,
 	0, 0, 0, 29,
 }
-var yyPact = []int{
+var yyPact = [...]int{
 
 	23, -1000, 146, 10, -1000, 60, 106, 131, 142, -22,
 	-1000, 396, -1000, 140, 139, 16, -1000, 18, -1000, 64,
@@ -269,12 +282,12 @@ var yyPact = []int{
 	-1000, -1000, 20, -1000, 151, -1000, -1000, -1000, 225, -1000,
 	-36, 396, 45, -1000, 107, -1000,
 }
-var yyPgo = []int{
+var yyPgo = [...]int{
 
 	0, 4, 1, 2, 3, 9, 6, 123, 168, 167,
 	166, 5, 0, 15, 16, 108, 122, 164, 162,
 }
-var yyR1 = []int{
+var yyR1 = [...]int{
 
 	0, 18, 1, 1, 7, 7, 7, 3, 3, 3,
 	3, 3, 3, 3, 2, 2, 2, 2, 2, 8,
@@ -285,7 +298,7 @@ var yyR1 = []int{
 	12, 12, 12, 12, 12, 12, 12, 12, 12, 12,
 	12, 12, 12, 12, 13, 13, 13, 13,
 }
-var yyR2 = []int{
+var yyR2 = [...]int{
 
 	0, 7, 3, 1, 6, 6, 0, 1, 1, 8,
 	2, 4, 4, 2, 1, 1, 1, 1, 1, 2,
@@ -296,7 +309,7 @@ var yyR2 = []int{
 	3, 3, 3, 3, 3, 3, 3, 3, 2, 1,
 	1, 1, 1, 1, 1, 4, 3, 2,
 }
-var yyChk = []int{
+var yyChk = [...]int{
 
 	-1000, -18, 36, 6, 56, -7, -8, 46, 44, -15,
 	-9, 11, -10, 24, 35, -1, 6, 6, 57, -17,
@@ -317,7 +330,7 @@ var yyChk = []int{
 	56, -4, 59, -3, 18, 21, -2, -14, -12, -3,
 	5, 17, 61, -14, 33, -2,
 }
-var yyDef = []int{
+var yyDef = [...]int{
 
 	0, -2, 0, 0, 6, 20, 0, 0, 0, 0,
 	19, 32, 6, 0, 0, 0, 3, 0, 1, 0,
@@ -338,7 +351,7 @@ var yyDef = []int{
 	22, 26, 0, 29, 0, 11, 12, 42, 0, 28,
 	0, 0, 0, 43, 0, 9,
 }
-var yyTok1 = []int{
+var yyTok1 = [...]int{
 
 	1, 3, 3, 3, 3, 3, 3, 3, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
@@ -351,7 +364,7 @@ var yyTok1 = []int{
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
 	3, 60, 3, 61, 62,
 }
-var yyTok2 = []int{
+var yyTok2 = [...]int{
 
 	2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
 	12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
@@ -359,28 +372,55 @@ var yyTok2 = []int{
 	32, 33, 34, 35, 36, 37, 38, 39, 40, 41,
 	42, 43, 44, 45, 46, 47, 55,
 }
-var yyTok3 = []int{
+var yyTok3 = [...]int{
 	0,
 }
+
+var yyErrorMessages = [...]struct {
+	state int
+	token int
+	msg   string
+}{}
 
 //line yaccpar:1
 
 /*	parser for yacc output	*/
 
-var yyDebug = 0
+var (
+	yyDebug        = 0
+	yyErrorVerbose = false
+)
 
 type yyLexer interface {
 	Lex(lval *yySymType) int
 	Error(s string)
 }
 
+type yyParser interface {
+	Parse(yyLexer) int
+	Lookahead() int
+}
+
+type yyParserImpl struct {
+	lval  yySymType
+	stack [yyInitialStackSize]yySymType
+	char  int
+}
+
+func (p *yyParserImpl) Lookahead() int {
+	return p.char
+}
+
+func yyNewParser() yyParser {
+	return &yyParserImpl{}
+}
+
 const yyFlag = -1000
 
 func yyTokname(c int) string {
-	// 4 is TOKSTART above
-	if c >= 4 && c-4 < len(yyToknames) {
-		if yyToknames[c-4] != "" {
-			return yyToknames[c-4]
+	if c >= 1 && c-1 < len(yyToknames) {
+		if yyToknames[c-1] != "" {
+			return yyToknames[c-1]
 		}
 	}
 	return __yyfmt__.Sprintf("tok-%v", c)
@@ -395,51 +435,127 @@ func yyStatname(s int) string {
 	return __yyfmt__.Sprintf("state-%v", s)
 }
 
-func yylex1(lex yyLexer, lval *yySymType) int {
-	c := 0
-	char := lex.Lex(lval)
+func yyErrorMessage(state, lookAhead int) string {
+	const TOKSTART = 4
+
+	if !yyErrorVerbose {
+		return "syntax error"
+	}
+
+	for _, e := range yyErrorMessages {
+		if e.state == state && e.token == lookAhead {
+			return "syntax error: " + e.msg
+		}
+	}
+
+	res := "syntax error: unexpected " + yyTokname(lookAhead)
+
+	// To match Bison, suggest at most four expected tokens.
+	expected := make([]int, 0, 4)
+
+	// Look for shiftable tokens.
+	base := yyPact[state]
+	for tok := TOKSTART; tok-1 < len(yyToknames); tok++ {
+		if n := base + tok; n >= 0 && n < yyLast && yyChk[yyAct[n]] == tok {
+			if len(expected) == cap(expected) {
+				return res
+			}
+			expected = append(expected, tok)
+		}
+	}
+
+	if yyDef[state] == -2 {
+		i := 0
+		for yyExca[i] != -1 || yyExca[i+1] != state {
+			i += 2
+		}
+
+		// Look for tokens that we accept or reduce.
+		for i += 2; yyExca[i] >= 0; i += 2 {
+			tok := yyExca[i]
+			if tok < TOKSTART || yyExca[i+1] == 0 {
+				continue
+			}
+			if len(expected) == cap(expected) {
+				return res
+			}
+			expected = append(expected, tok)
+		}
+
+		// If the default action is to accept or reduce, give up.
+		if yyExca[i+1] != 0 {
+			return res
+		}
+	}
+
+	for i, tok := range expected {
+		if i == 0 {
+			res += ", expecting "
+		} else {
+			res += " or "
+		}
+		res += yyTokname(tok)
+	}
+	return res
+}
+
+func yylex1(lex yyLexer, lval *yySymType) (char, token int) {
+	token = 0
+	char = lex.Lex(lval)
 	if char <= 0 {
-		c = yyTok1[0]
+		token = yyTok1[0]
 		goto out
 	}
 	if char < len(yyTok1) {
-		c = yyTok1[char]
+		token = yyTok1[char]
 		goto out
 	}
 	if char >= yyPrivate {
 		if char < yyPrivate+len(yyTok2) {
-			c = yyTok2[char-yyPrivate]
+			token = yyTok2[char-yyPrivate]
 			goto out
 		}
 	}
 	for i := 0; i < len(yyTok3); i += 2 {
-		c = yyTok3[i+0]
-		if c == char {
-			c = yyTok3[i+1]
+		token = yyTok3[i+0]
+		if token == char {
+			token = yyTok3[i+1]
 			goto out
 		}
 	}
 
 out:
-	if c == 0 {
-		c = yyTok2[1] /* unknown char */
+	if token == 0 {
+		token = yyTok2[1] /* unknown char */
 	}
 	if yyDebug >= 3 {
-		__yyfmt__.Printf("lex %s(%d)\n", yyTokname(c), uint(char))
+		__yyfmt__.Printf("lex %s(%d)\n", yyTokname(token), uint(char))
 	}
-	return c
+	return char, token
 }
 
 func yyParse(yylex yyLexer) int {
+	return yyNewParser().Parse(yylex)
+}
+
+func (yyrcvr *yyParserImpl) Parse(yylex yyLexer) int {
 	var yyn int
-	var yylval yySymType
 	var yyVAL yySymType
-	yyS := make([]yySymType, yyMaxDepth)
+	var yyDollar []yySymType
+	_ = yyDollar // silence set and not used
+	yyS := yyrcvr.stack[:]
 
 	Nerrs := 0   /* number of errors */
 	Errflag := 0 /* error recovery flag */
 	yystate := 0
-	yychar := -1
+	yyrcvr.char = -1
+	yytoken := -1 // yyrcvr.char translated into internal numbering
+	defer func() {
+		// Make sure we report no lookahead when not parsing.
+		yystate = -1
+		yyrcvr.char = -1
+		yytoken = -1
+	}()
 	yyp := -1
 	goto yystack
 
@@ -452,7 +568,7 @@ ret1:
 yystack:
 	/* put a state and value onto the stack */
 	if yyDebug >= 4 {
-		__yyfmt__.Printf("char %v in %v\n", yyTokname(yychar), yyStatname(yystate))
+		__yyfmt__.Printf("char %v in %v\n", yyTokname(yytoken), yyStatname(yystate))
 	}
 
 	yyp++
@@ -469,17 +585,18 @@ yynewstate:
 	if yyn <= yyFlag {
 		goto yydefault /* simple state */
 	}
-	if yychar < 0 {
-		yychar = yylex1(yylex, &yylval)
+	if yyrcvr.char < 0 {
+		yyrcvr.char, yytoken = yylex1(yylex, &yyrcvr.lval)
 	}
-	yyn += yychar
+	yyn += yytoken
 	if yyn < 0 || yyn >= yyLast {
 		goto yydefault
 	}
 	yyn = yyAct[yyn]
-	if yyChk[yyn] == yychar { /* valid shift */
-		yychar = -1
-		yyVAL = yylval
+	if yyChk[yyn] == yytoken { /* valid shift */
+		yyrcvr.char = -1
+		yytoken = -1
+		yyVAL = yyrcvr.lval
 		yystate = yyn
 		if Errflag > 0 {
 			Errflag--
@@ -491,8 +608,8 @@ yydefault:
 	/* default state action */
 	yyn = yyDef[yystate]
 	if yyn == -2 {
-		if yychar < 0 {
-			yychar = yylex1(yylex, &yylval)
+		if yyrcvr.char < 0 {
+			yyrcvr.char, yytoken = yylex1(yylex, &yyrcvr.lval)
 		}
 
 		/* look through exception table */
@@ -505,7 +622,7 @@ yydefault:
 		}
 		for xi += 2; ; xi += 2 {
 			yyn = yyExca[xi+0]
-			if yyn < 0 || yyn == yychar {
+			if yyn < 0 || yyn == yytoken {
 				break
 			}
 		}
@@ -518,11 +635,11 @@ yydefault:
 		/* error ... attempt to resume parsing */
 		switch Errflag {
 		case 0: /* brand new error */
-			yylex.Error("syntax error")
+			yylex.Error(yyErrorMessage(yystate, yytoken))
 			Nerrs++
 			if yyDebug >= 1 {
 				__yyfmt__.Printf("%s", yyStatname(yystate))
-				__yyfmt__.Printf(" saw %s\n", yyTokname(yychar))
+				__yyfmt__.Printf(" saw %s\n", yyTokname(yytoken))
 			}
 			fallthrough
 
@@ -550,12 +667,13 @@ yydefault:
 
 		case 3: /* no shift yet; clobber input char */
 			if yyDebug >= 2 {
-				__yyfmt__.Printf("error recovery discards %s\n", yyTokname(yychar))
+				__yyfmt__.Printf("error recovery discards %s\n", yyTokname(yytoken))
 			}
-			if yychar == yyEofCode {
+			if yytoken == yyEofCode {
 				goto ret1
 			}
-			yychar = -1
+			yyrcvr.char = -1
+			yytoken = -1
 			goto yynewstate /* try again in the same state */
 		}
 	}
@@ -570,6 +688,13 @@ yydefault:
 	_ = yypt // guard against "declared and not used"
 
 	yyp -= yyR2[yyn]
+	// yyp is now the index of $0. Perform the default action. Iff the
+	// reduced production is ε, $1 is possibly out of range.
+	if yyp+1 >= len(yyS) {
+		nyys := make([]yySymType, len(yyS)*2)
+		copy(nyys, yyS)
+		yyS = nyys
+	}
 	yyVAL = yyS[yyp+1]
 
 	/* consult goto table to find next state */
@@ -589,411 +714,488 @@ yydefault:
 	switch yynt {
 
 	case 1:
+		yyDollar = yyS[yypt-7 : yypt+1]
 		//line parser.y:53
 		{
-			program = varProgram{varDecl: varDecl{name: yyS[yypt-5].s}, vars: yyS[yypt-3].decls.vars, types: yyS[yypt-3].decls.types, subprogs: yyS[yypt-2].functions, body: yyS[yypt-1].stmt}
+			program = varProgram{varDecl: varDecl{name: yyDollar[2].s}, vars: yyDollar[4].decls.vars, types: yyDollar[4].decls.types, subprogs: yyDollar[5].functions, body: yyDollar[6].stmt}
 		}
 	case 2:
+		yyDollar = yyS[yypt-3 : yypt+1]
 		//line parser.y:55
 		{
-			yyVAL.strings = append(yyS[yypt-2].strings, yyS[yypt-0].s)
+			yyVAL.strings = append(yyDollar[1].strings, yyDollar[3].s)
 		}
 	case 3:
+		yyDollar = yyS[yypt-1 : yypt+1]
 		//line parser.y:56
 		{
-			yyVAL.strings = append(yyVAL.strings, yyS[yypt-0].s)
+			yyVAL.strings = append(yyVAL.strings, yyDollar[1].s)
 		}
 	case 4:
+		yyDollar = yyS[yypt-6 : yypt+1]
 		//line parser.y:59
 		{
-			for _, id := range yyS[yypt-3].strings {
-				yyVAL.decls.vars = append(yyVAL.decls.vars, &varId{varDecl: varDecl{name: id, typ: yyS[yypt-1].ptyp}})
+			for _, id := range yyDollar[3].strings {
+				yyVAL.decls.vars = append(yyVAL.decls.vars, &varId{varDecl: varDecl{name: id, typ: yyDollar[5].ptyp}})
 			}
 		}
 	case 5:
+		yyDollar = yyS[yypt-6 : yypt+1]
 		//line parser.y:60
 		{
-			yyVAL.decls.types = append(yyS[yypt-5].decls.types, &typTypedef{name: yyS[yypt-3].s, typ: yyS[yypt-1].ptyp})
+			yyVAL.decls.types = append(yyDollar[1].decls.types, &typTypedef{name: yyDollar[3].s, typ: yyDollar[5].ptyp})
 		}
 	case 6:
+		yyDollar = yyS[yypt-0 : yypt+1]
 		//line parser.y:61
 		{
 			yyVAL.decls = pDecls{}
 		}
 	case 7:
+		yyDollar = yyS[yypt-1 : yypt+1]
 		//line parser.y:64
 		{
-			yyVAL.ptyp = yyS[yypt-0].ptyp
+			yyVAL.ptyp = yyDollar[1].ptyp
 		}
 	case 8:
+		yyDollar = yyS[yypt-1 : yypt+1]
 		//line parser.y:65
 		{
-			yyVAL.ptyp = typTypedef{name: yyS[yypt-0].s}
+			yyVAL.ptyp = typTypedef{name: yyDollar[1].s}
 		}
 	case 9:
+		yyDollar = yyS[yypt-8 : yypt+1]
 		//line parser.y:66
 		{
-			yyVAL.ptyp = typArray{start: yyS[yypt-5].i, end: yyS[yypt-3].i, typ: yyS[yypt-0].ptyp}
+			yyVAL.ptyp = typArray{start: yyDollar[3].i, end: yyDollar[5].i, typ: yyDollar[8].ptyp}
 		}
 	case 10:
+		yyDollar = yyS[yypt-2 : yypt+1]
 		//line parser.y:67
 		{
-			yyVAL.ptyp = typPointer{typ: yyS[yypt-0].ptyp}
+			yyVAL.ptyp = typPointer{typ: yyDollar[2].ptyp}
 		}
 	case 11:
+		yyDollar = yyS[yypt-4 : yypt+1]
 		//line parser.y:68
 		{
-			yyVAL.ptyp = typRecord{fields: yyS[yypt-2].vars}
+			yyVAL.ptyp = typRecord{fields: yyDollar[2].vars}
 		}
 	case 12:
+		yyDollar = yyS[yypt-4 : yypt+1]
 		//line parser.y:69
 		{
 			yyVAL.ptyp = typVoid{}
 		}
 	case 13:
+		yyDollar = yyS[yypt-2 : yypt+1]
 		//line parser.y:70
 		{
 			yyVAL.ptyp = typVoid{}
 		}
 	case 14:
+		yyDollar = yyS[yypt-1 : yypt+1]
 		//line parser.y:73
 		{
 			yyVAL.ptyp = typPrimitive{primInt}
 		}
 	case 15:
+		yyDollar = yyS[yypt-1 : yypt+1]
 		//line parser.y:74
 		{
 			yyVAL.ptyp = typPrimitive{primReal}
 		}
 	case 16:
+		yyDollar = yyS[yypt-1 : yypt+1]
 		//line parser.y:75
 		{
 			yyVAL.ptyp = typPrimitive{primChar}
 		}
 	case 17:
+		yyDollar = yyS[yypt-1 : yypt+1]
 		//line parser.y:76
 		{
 			yyVAL.ptyp = typPrimitive{primBool}
 		}
 	case 18:
+		yyDollar = yyS[yypt-1 : yypt+1]
 		//line parser.y:77
 		{
 			yyVAL.ptyp = typPrimitive{primString}
 		}
 	case 19:
+		yyDollar = yyS[yypt-2 : yypt+1]
 		//line parser.y:80
 		{
-			yyVAL.functions = append(yyS[yypt-1].functions, yyS[yypt-0].function)
+			yyVAL.functions = append(yyDollar[1].functions, yyDollar[2].function)
 		}
 	case 20:
+		yyDollar = yyS[yypt-0 : yypt+1]
 		//line parser.y:81
 		{
 			yyVAL.functions = nil
 		}
 	case 21:
+		yyDollar = yyS[yypt-4 : yypt+1]
 		//line parser.y:84
 		{
-			yyS[yypt-3].function.decls = yyS[yypt-2].decls.vars
-			yyS[yypt-3].function.body = yyS[yypt-1].stmt
-			yyVAL.function = yyS[yypt-3].function
+			yyDollar[1].function.decls = yyDollar[2].decls.vars
+			yyDollar[1].function.body = yyDollar[3].stmt
+			yyVAL.function = yyDollar[1].function
 		}
 	case 22:
+		yyDollar = yyS[yypt-6 : yypt+1]
 		//line parser.y:87
 		{
 			yyVAL.function = &varFunction{
 				varDecl: varDecl{
-					name: yyS[yypt-4].s,
-					typ:  typFunction{name: yyS[yypt-4].s, args: yyS[yypt-3].vars, ret: yyS[yypt-1].ptyp},
+					name: yyDollar[2].s,
+					typ:  typFunction{name: yyDollar[2].s, args: yyDollar[3].vars, ret: yyDollar[5].ptyp},
 				},
-				args: yyS[yypt-3].vars,
-				ret:  &varId{varDecl: varDecl{typ: yyS[yypt-1].ptyp}},
+				args: yyDollar[3].vars,
+				ret:  &varId{varDecl: varDecl{typ: yyDollar[5].ptyp}},
 			}
 		}
 	case 23:
+		yyDollar = yyS[yypt-4 : yypt+1]
 		//line parser.y:97
 		{
 			yyVAL.function = &varFunction{
 				varDecl: varDecl{
-					name: yyS[yypt-2].s,
-					typ:  typFunction{name: yyS[yypt-2].s, args: yyS[yypt-1].vars, ret: typVoid{}},
+					name: yyDollar[2].s,
+					typ:  typFunction{name: yyDollar[2].s, args: yyDollar[3].vars, ret: typVoid{}},
 				},
-				args: yyS[yypt-1].vars,
+				args: yyDollar[3].vars,
 				ret:  &varId{varDecl: varDecl{typ: typVoid{}}},
 			}
 		}
 	case 24:
+		yyDollar = yyS[yypt-3 : yypt+1]
 		//line parser.y:109
 		{
-			yyVAL.vars = yyS[yypt-1].vars
+			yyVAL.vars = yyDollar[2].vars
 		}
 	case 25:
+		yyDollar = yyS[yypt-0 : yypt+1]
 		//line parser.y:110
 		{
 			yyVAL.vars = nil
 		}
 	case 26:
+		yyDollar = yyS[yypt-3 : yypt+1]
 		//line parser.y:113
 		{
-			yyVAL.vars = append(yyS[yypt-2].vars, yyS[yypt-0].vars...)
+			yyVAL.vars = append(yyDollar[1].vars, yyDollar[3].vars...)
 		}
 	case 27:
+		yyDollar = yyS[yypt-1 : yypt+1]
 		//line parser.y:114
 		{
-			yyVAL.vars = yyS[yypt-0].vars
+			yyVAL.vars = yyDollar[1].vars
 		}
 	case 28:
+		yyDollar = yyS[yypt-4 : yypt+1]
 		//line parser.y:117
 		{
-			for _, id := range yyS[yypt-2].strings {
-				yyVAL.vars = append(yyVAL.vars, &varId{varDecl: varDecl{name: id, typ: yyS[yypt-0].ptyp}})
+			for _, id := range yyDollar[2].strings {
+				yyVAL.vars = append(yyVAL.vars, &varId{varDecl: varDecl{name: id, typ: yyDollar[4].ptyp}})
 			}
 		}
 	case 29:
+		yyDollar = yyS[yypt-3 : yypt+1]
 		//line parser.y:118
 		{
-			for _, id := range yyS[yypt-2].strings {
-				yyVAL.vars = append(yyVAL.vars, &varId{varDecl: varDecl{name: id, typ: yyS[yypt-0].ptyp}})
+			for _, id := range yyDollar[1].strings {
+				yyVAL.vars = append(yyVAL.vars, &varId{varDecl: varDecl{name: id, typ: yyDollar[3].ptyp}})
 			}
 		}
 	case 30:
+		yyDollar = yyS[yypt-3 : yypt+1]
 		//line parser.y:121
 		{
-			yyVAL.stmt = &stmBlock{stmts: yyS[yypt-1].stmts}
+			yyVAL.stmt = &stmBlock{stmts: yyDollar[2].stmts}
 		}
 	case 31:
+		yyDollar = yyS[yypt-1 : yypt+1]
 		//line parser.y:123
 		{
-			yyVAL.stmts = yyS[yypt-0].stmts
+			yyVAL.stmts = yyDollar[1].stmts
 		}
 	case 32:
+		yyDollar = yyS[yypt-0 : yypt+1]
 		//line parser.y:124
 		{
 			yyVAL.stmts = nil
 		}
 	case 33:
+		yyDollar = yyS[yypt-3 : yypt+1]
 		//line parser.y:127
 		{
-			yyVAL.stmts = append(yyS[yypt-2].stmts, yyS[yypt-1].stmt)
+			yyVAL.stmts = append(yyDollar[1].stmts, yyDollar[2].stmt)
 		}
 	case 34:
+		yyDollar = yyS[yypt-2 : yypt+1]
 		//line parser.y:128
 		{
-			yyVAL.stmts = []stmt{yyS[yypt-1].stmt}
+			yyVAL.stmts = []stmt{yyDollar[1].stmt}
 		}
 	case 35:
+		yyDollar = yyS[yypt-3 : yypt+1]
 		//line parser.y:131
 		{
-			yyVAL.stmt = &stmAssign{id: yyS[yypt-2].expr, e: yyS[yypt-0].expr}
+			yyVAL.stmt = &stmAssign{id: yyDollar[1].expr, e: yyDollar[3].expr}
 		}
 	case 36:
+		yyDollar = yyS[yypt-1 : yypt+1]
 		//line parser.y:132
 		{
 			yyVAL.stmt = &stmBreak{}
 		}
 	case 37:
+		yyDollar = yyS[yypt-1 : yypt+1]
 		//line parser.y:133
 		{
 			yyVAL.stmt = &stmContinue{}
 		}
 	case 38:
+		yyDollar = yyS[yypt-4 : yypt+1]
 		//line parser.y:134
 		{
-			yyVAL.stmt = &stmCall{fn: &expId{name: yyS[yypt-3].s}, args: yyS[yypt-1].exprs}
+			yyVAL.stmt = &stmCall{fn: &expId{name: yyDollar[1].s}, args: yyDollar[3].exprs}
 		}
 	case 39:
+		yyDollar = yyS[yypt-1 : yypt+1]
 		//line parser.y:135
 		{
-			yyVAL.stmt = &stmCall{fn: &expId{name: yyS[yypt-0].s}}
+			yyVAL.stmt = &stmCall{fn: &expId{name: yyDollar[1].s}}
 		}
 	case 40:
+		yyDollar = yyS[yypt-1 : yypt+1]
 		//line parser.y:136
 		{
-			yyVAL.stmt = yyS[yypt-0].stmt
+			yyVAL.stmt = yyDollar[1].stmt
 		}
 	case 41:
+		yyDollar = yyS[yypt-4 : yypt+1]
 		//line parser.y:137
 		{
-			yyVAL.stmt = &stmIf{cond: yyS[yypt-2].expr, ifTrue: yyS[yypt-0].stmt}
+			yyVAL.stmt = &stmIf{cond: yyDollar[2].expr, ifTrue: yyDollar[4].stmt}
 		}
 	case 42:
+		yyDollar = yyS[yypt-6 : yypt+1]
 		//line parser.y:138
 		{
-			yyVAL.stmt = &stmIf{cond: yyS[yypt-4].expr, ifTrue: yyS[yypt-2].stmt, ifFalse: yyS[yypt-0].stmt}
+			yyVAL.stmt = &stmIf{cond: yyDollar[2].expr, ifTrue: yyDollar[4].stmt, ifFalse: yyDollar[6].stmt}
 		}
 	case 43:
+		yyDollar = yyS[yypt-8 : yypt+1]
 		//line parser.y:139
 		{
-			yyVAL.stmt = &stmFor{counter: &expId{name: yyS[yypt-6].s}, expr1: yyS[yypt-4].expr, expr2: yyS[yypt-2].expr, body: yyS[yypt-0].stmt}
+			yyVAL.stmt = &stmFor{counter: &expId{name: yyDollar[2].s}, expr1: yyDollar[4].expr, expr2: yyDollar[6].expr, body: yyDollar[8].stmt}
 		}
 	case 44:
+		yyDollar = yyS[yypt-4 : yypt+1]
 		//line parser.y:140
 		{
-			yyVAL.stmt = &stmWhile{e: yyS[yypt-2].expr, body: yyS[yypt-0].stmt}
+			yyVAL.stmt = &stmWhile{e: yyDollar[2].expr, body: yyDollar[4].stmt}
 		}
 	case 45:
+		yyDollar = yyS[yypt-4 : yypt+1]
 		//line parser.y:141
 		{
-			yyVAL.stmt = &stmRepeat{e: yyS[yypt-0].expr, body: &stmBlock{yyS[yypt-2].stmts}}
+			yyVAL.stmt = &stmRepeat{e: yyDollar[4].expr, body: &stmBlock{yyDollar[2].stmts}}
 		}
 	case 46:
+		yyDollar = yyS[yypt-3 : yypt+1]
 		//line parser.y:144
 		{
-			yyVAL.exprs = append(yyS[yypt-2].exprs, yyS[yypt-0].expr)
+			yyVAL.exprs = append(yyDollar[1].exprs, yyDollar[3].expr)
 		}
 	case 47:
+		yyDollar = yyS[yypt-1 : yypt+1]
 		//line parser.y:145
 		{
-			yyVAL.exprs = []expr{yyS[yypt-0].expr}
+			yyVAL.exprs = []expr{yyDollar[1].expr}
 		}
 	case 48:
+		yyDollar = yyS[yypt-4 : yypt+1]
 		//line parser.y:148
 		{
-			yyVAL.expr = &expCall{fn: &expId{name: yyS[yypt-3].s}, args: yyS[yypt-1].exprs}
+			yyVAL.expr = &expCall{fn: &expId{name: yyDollar[1].s}, args: yyDollar[3].exprs}
 		}
 	case 49:
+		yyDollar = yyS[yypt-2 : yypt+1]
 		//line parser.y:149
 		{
-			yyVAL.expr = &expUnop{op: unopAt, e: yyS[yypt-0].expr}
+			yyVAL.expr = &expUnop{op: unopAt, e: yyDollar[2].expr}
 		}
 	case 50:
+		yyDollar = yyS[yypt-2 : yypt+1]
 		//line parser.y:150
 		{
-			yyVAL.expr = &expUnop{op: unopPlus, e: yyS[yypt-0].expr}
+			yyVAL.expr = &expUnop{op: unopPlus, e: yyDollar[2].expr}
 		}
 	case 51:
+		yyDollar = yyS[yypt-2 : yypt+1]
 		//line parser.y:151
 		{
-			yyVAL.expr = &expUnop{op: unopMinus, e: yyS[yypt-0].expr}
+			yyVAL.expr = &expUnop{op: unopMinus, e: yyDollar[2].expr}
 		}
 	case 52:
+		yyDollar = yyS[yypt-1 : yypt+1]
 		//line parser.y:152
 		{
-			yyVAL.expr = yyS[yypt-0].expr
+			yyVAL.expr = yyDollar[1].expr
 		}
 	case 53:
+		yyDollar = yyS[yypt-3 : yypt+1]
 		//line parser.y:153
 		{
-			yyVAL.expr = &expBinop{op: binAND, left: yyS[yypt-2].expr, right: yyS[yypt-0].expr}
+			yyVAL.expr = &expBinop{op: binAND, left: yyDollar[1].expr, right: yyDollar[3].expr}
 		}
 	case 54:
+		yyDollar = yyS[yypt-3 : yypt+1]
 		//line parser.y:154
 		{
-			yyVAL.expr = &expBinop{op: binDIV, left: yyS[yypt-2].expr, right: yyS[yypt-0].expr}
+			yyVAL.expr = &expBinop{op: binDIV, left: yyDollar[1].expr, right: yyDollar[3].expr}
 		}
 	case 55:
+		yyDollar = yyS[yypt-3 : yypt+1]
 		//line parser.y:155
 		{
-			yyVAL.expr = &expBinop{op: binLT, left: yyS[yypt-2].expr, right: yyS[yypt-0].expr}
+			yyVAL.expr = &expBinop{op: binLT, left: yyDollar[1].expr, right: yyDollar[3].expr}
 		}
 	case 56:
+		yyDollar = yyS[yypt-3 : yypt+1]
 		//line parser.y:156
 		{
-			yyVAL.expr = &expBinop{op: binEQ, left: yyS[yypt-2].expr, right: yyS[yypt-0].expr}
+			yyVAL.expr = &expBinop{op: binEQ, left: yyDollar[1].expr, right: yyDollar[3].expr}
 		}
 	case 57:
+		yyDollar = yyS[yypt-3 : yypt+1]
 		//line parser.y:157
 		{
-			yyVAL.expr = &expBinop{op: binGT, left: yyS[yypt-2].expr, right: yyS[yypt-0].expr}
+			yyVAL.expr = &expBinop{op: binGT, left: yyDollar[1].expr, right: yyDollar[3].expr}
 		}
 	case 58:
+		yyDollar = yyS[yypt-3 : yypt+1]
 		//line parser.y:158
 		{
-			yyVAL.expr = &expBinop{op: binSUB, left: yyS[yypt-2].expr, right: yyS[yypt-0].expr}
+			yyVAL.expr = &expBinop{op: binSUB, left: yyDollar[1].expr, right: yyDollar[3].expr}
 		}
 	case 59:
+		yyDollar = yyS[yypt-3 : yypt+1]
 		//line parser.y:159
 		{
-			yyVAL.expr = &expBinop{op: binFDIV, left: yyS[yypt-2].expr, right: yyS[yypt-0].expr}
+			yyVAL.expr = &expBinop{op: binFDIV, left: yyDollar[1].expr, right: yyDollar[3].expr}
 		}
 	case 60:
+		yyDollar = yyS[yypt-3 : yypt+1]
 		//line parser.y:160
 		{
-			yyVAL.expr = &expBinop{op: binMUL, left: yyS[yypt-2].expr, right: yyS[yypt-0].expr}
+			yyVAL.expr = &expBinop{op: binMUL, left: yyDollar[1].expr, right: yyDollar[3].expr}
 		}
 	case 61:
+		yyDollar = yyS[yypt-3 : yypt+1]
 		//line parser.y:161
 		{
-			yyVAL.expr = &expBinop{op: binADD, left: yyS[yypt-2].expr, right: yyS[yypt-0].expr}
+			yyVAL.expr = &expBinop{op: binADD, left: yyDollar[1].expr, right: yyDollar[3].expr}
 		}
 	case 62:
+		yyDollar = yyS[yypt-3 : yypt+1]
 		//line parser.y:162
 		{
-			yyVAL.expr = &expBinop{op: binGE, left: yyS[yypt-2].expr, right: yyS[yypt-0].expr}
+			yyVAL.expr = &expBinop{op: binGE, left: yyDollar[1].expr, right: yyDollar[3].expr}
 		}
 	case 63:
+		yyDollar = yyS[yypt-3 : yypt+1]
 		//line parser.y:163
 		{
-			yyVAL.expr = &expBinop{op: binLE, left: yyS[yypt-2].expr, right: yyS[yypt-0].expr}
+			yyVAL.expr = &expBinop{op: binLE, left: yyDollar[1].expr, right: yyDollar[3].expr}
 		}
 	case 64:
+		yyDollar = yyS[yypt-3 : yypt+1]
 		//line parser.y:164
 		{
-			yyVAL.expr = &expBinop{op: binMOD, left: yyS[yypt-2].expr, right: yyS[yypt-0].expr}
+			yyVAL.expr = &expBinop{op: binMOD, left: yyDollar[1].expr, right: yyDollar[3].expr}
 		}
 	case 65:
+		yyDollar = yyS[yypt-3 : yypt+1]
 		//line parser.y:165
 		{
-			yyVAL.expr = &expBinop{op: binNE, left: yyS[yypt-2].expr, right: yyS[yypt-0].expr}
+			yyVAL.expr = &expBinop{op: binNE, left: yyDollar[1].expr, right: yyDollar[3].expr}
 		}
 	case 66:
+		yyDollar = yyS[yypt-3 : yypt+1]
 		//line parser.y:166
 		{
-			yyVAL.expr = &expBinop{op: binOR, left: yyS[yypt-2].expr, right: yyS[yypt-0].expr}
+			yyVAL.expr = &expBinop{op: binOR, left: yyDollar[1].expr, right: yyDollar[3].expr}
 		}
 	case 67:
+		yyDollar = yyS[yypt-3 : yypt+1]
 		//line parser.y:167
 		{
-			yyVAL.expr = yyS[yypt-1].expr
+			yyVAL.expr = yyDollar[2].expr
 		}
 	case 68:
+		yyDollar = yyS[yypt-2 : yypt+1]
 		//line parser.y:168
 		{
-			yyVAL.expr = &expUnop{op: unopNot, e: yyS[yypt-0].expr}
+			yyVAL.expr = &expUnop{op: unopNot, e: yyDollar[2].expr}
 		}
 	case 69:
+		yyDollar = yyS[yypt-1 : yypt+1]
 		//line parser.y:169
 		{
-			yyVAL.expr = &expConst{t: primInt, i: yyS[yypt-0].i}
+			yyVAL.expr = &expConst{t: primInt, i: yyDollar[1].i}
 		}
 	case 70:
+		yyDollar = yyS[yypt-1 : yypt+1]
 		//line parser.y:170
 		{
-			yyVAL.expr = &expConst{t: primReal, f: yyS[yypt-0].f}
+			yyVAL.expr = &expConst{t: primReal, f: yyDollar[1].f}
 		}
 	case 71:
+		yyDollar = yyS[yypt-1 : yypt+1]
 		//line parser.y:171
 		{
 			yyVAL.expr = &expConst{t: primBool, b: true}
 		}
 	case 72:
+		yyDollar = yyS[yypt-1 : yypt+1]
 		//line parser.y:172
 		{
 			yyVAL.expr = &expConst{t: primBool, b: false}
 		}
 	case 73:
+		yyDollar = yyS[yypt-1 : yypt+1]
 		//line parser.y:173
 		{
-			yyVAL.expr = &expConst{t: primString, s: yyS[yypt-0].s}
+			yyVAL.expr = &expConst{t: primString, s: yyDollar[1].s}
 		}
 	case 74:
+		yyDollar = yyS[yypt-1 : yypt+1]
 		//line parser.y:176
 		{
-			yyVAL.expr = &expId{name: yyS[yypt-0].s}
+			yyVAL.expr = &expId{name: yyDollar[1].s}
 		}
 	case 75:
+		yyDollar = yyS[yypt-4 : yypt+1]
 		//line parser.y:177
 		{
-			yyVAL.expr = &expBinop{op: binArrayIndex, left: yyS[yypt-3].expr, right: yyS[yypt-1].expr}
+			yyVAL.expr = &expBinop{op: binArrayIndex, left: yyDollar[1].expr, right: yyDollar[3].expr}
 		}
 	case 76:
+		yyDollar = yyS[yypt-3 : yypt+1]
 		//line parser.y:178
 		{
-			yyVAL.expr = &expField{e: yyS[yypt-2].expr, field: &expId{name: yyS[yypt-0].s}}
+			yyVAL.expr = &expField{e: yyDollar[1].expr, field: &expId{name: yyDollar[3].s}}
 		}
 	case 77:
+		yyDollar = yyS[yypt-2 : yypt+1]
 		//line parser.y:179
 		{
-			yyVAL.expr = &expUnop{op: unopPtr, e: yyS[yypt-1].expr}
+			yyVAL.expr = &expUnop{op: unopPtr, e: yyDollar[1].expr}
 		}
 	}
 	goto yystack /* stack new state and value */

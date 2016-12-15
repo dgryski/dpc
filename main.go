@@ -1,5 +1,5 @@
 //go:generate ragel -Z lexer.rl
-//go:generate go tool yacc parser.y
+//go:generate goyacc parser.y
 
 package main
 
