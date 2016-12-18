@@ -22,6 +22,10 @@ func main() {
 		return
 	}
 
+	var f frame
+
+	f.allocateVars(program)
+
 	bind(program)
 	typecheck(program)
 	fmt.Println(spew.Sdump(program))

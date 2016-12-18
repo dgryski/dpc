@@ -20,6 +20,11 @@ type frame struct {
 	return_value ireTemp
 }
 
+func (f *frame) reset() {
+	f.paramOffset = 4
+	f.localOffset = 0
+}
+
 func (f *frame) FP() irnode {
 	if f.framePointer == nil {
 		f.framePointer = newTempReg("fp")
@@ -71,4 +76,22 @@ func (f *frame) allocateString(s string) irnode {
 	}
 
 	return where
+}
+
+func (f *frame) allocateVars(program varProgram) {
+	for _, v := range program.vars {
+		v.where = f.allocateGlobal(v.Name(), v.Type().Size())
+	}
+
+	for _, subprog := range program.subprogs {
+		f.reset()
+
+		for _, v := range subprog.args {
+			v.where = f.allocateParam(v.Type().Size())
+		}
+
+		for _, v := range subprog.decls {
+			v.where = f.allocateLocal(v.Type().Size())
+		}
+	}
 }

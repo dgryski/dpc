@@ -1,8 +1,9 @@
 package main
 
 type varDecl struct {
-	name string
-	typ  pType
+	name  string
+	typ   pType
+	where irnode
 }
 
 func (p *varDecl) Name() string { return p.name }
@@ -23,10 +24,11 @@ type varId struct {
 
 type varFunction struct {
 	varDecl
-	args  []*varId
-	ret   *varId
-	decls []*varId
-	body  stmt
+	args      []*varId
+	ret       *varId
+	decls     []*varId
+	frameSize int
+	body      stmt
 }
 
 type varType struct {
