@@ -5,48 +5,9 @@ type exprLabels struct {
 	iffalse *irsLabel
 }
 
-func (e *exprLabels) IfTrue() irnode {
-	return e.iftrue
-}
-
-func (e *exprLabels) IfFalse() irnode {
-	return e.iffalse
-}
-
-func (e *exprLabels) Break() irnode {
-	panic("wrong label type")
-}
-
-func (e *exprLabels) Continue() irnode {
-	panic("wrong label type")
-}
-
 type stmtLabels struct {
 	lbreak    *irsLabel
 	lcontinue *irsLabel
-}
-
-func (s *stmtLabels) IfTrue() irnode {
-	panic("wrong label type")
-}
-
-func (s *stmtLabels) IfFalse() irnode {
-	panic("wrong label type")
-}
-
-func (s *stmtLabels) Break() irnode {
-	return s.lbreak
-}
-
-func (s *stmtLabels) Continue() irnode {
-	return s.lcontinue
-}
-
-type labels interface {
-	IfTrue() irnode
-	IfFalse() irnode
-	Break() irnode
-	Continue() irnode
 }
 
 func translateProgram(program varProgram) irnode {
@@ -70,7 +31,7 @@ func translateProgram(program varProgram) irnode {
 	return &irsSeq{seq}
 }
 
-func translateStmt(body stmt, l labels) irnode {
+func translateStmt(body stmt, l *stmtLabels) irnode {
 
 	switch s := body.(type) {
 	case *stmAssign:
@@ -96,28 +57,28 @@ func translateStmt(body stmt, l labels) irnode {
 	panic("unhandled stmt type")
 }
 
-func translateStmtAssign(s *stmAssign, l labels) irnode {
+func translateStmtAssign(s *stmAssign, l *stmtLabels) irnode {
 	lval := translateExpr(s.id)
 	rval := translateExpr(s.e)
 	return &irsMove{lval, rval}
 }
 
-func translateStmtBreak(s *stmBreak, l labels) irnode {
+func translateStmtBreak(s *stmBreak, l *stmtLabels) irnode {
 	if l == nil {
 		panic("break outside loop")
 	}
-	return &irsJump{l.Break()}
+	return &irsJump{l.lbreak}
 }
-func translateStmtCall(s *stmCall, l labels) irnode {
+func translateStmtCall(s *stmCall, l *stmtLabels) irnode {
 	return &irsNop{}
 }
-func translateStmtContinue(s *stmContinue, l labels) irnode {
+func translateStmtContinue(s *stmContinue, l *stmtLabels) irnode {
 	if l == nil {
 		panic("continue outside loop")
 	}
-	return &irsJump{l.Continue()}
+	return &irsJump{l.lcontinue}
 }
-func translateStmtBlock(s *stmBlock, l labels) irnode {
+func translateStmtBlock(s *stmBlock, l *stmtLabels) irnode {
 	var seq []irnode
 
 	for _, ss := range s.stmts {
@@ -126,7 +87,7 @@ func translateStmtBlock(s *stmBlock, l labels) irnode {
 	return &irsSeq{seq}
 
 }
-func translateStmtIf(s *stmIf, l labels) irnode {
+func translateStmtIf(s *stmIf, l *stmtLabels) irnode {
 
 	labelTrue := newTempLabel("")
 	labelFalse := newTempLabel("")
@@ -145,10 +106,10 @@ func translateStmtIf(s *stmIf, l labels) irnode {
 	}}
 }
 
-func translateStmtFor(s *stmFor, l labels) irnode {
+func translateStmtFor(s *stmFor, l *stmtLabels) irnode {
 	return &irsNop{}
 }
-func translateStmtWhile(s *stmWhile, l labels) irnode {
+func translateStmtWhile(s *stmWhile, l *stmtLabels) irnode {
 	labelLoop := newTempLabel("")
 	labelAfter := newTempLabel("")
 	labelTest := newTempLabel("")
@@ -165,7 +126,7 @@ func translateStmtWhile(s *stmWhile, l labels) irnode {
 		labelAfter,
 	}}
 }
-func translateStmtRepeat(s *stmRepeat, l labels) irnode {
+func translateStmtRepeat(s *stmRepeat, l *stmtLabels) irnode {
 	labelLoop := newTempLabel("")
 	labelAfter := newTempLabel("")
 	labelTest := newTempLabel("")
@@ -182,7 +143,7 @@ func translateStmtRepeat(s *stmRepeat, l labels) irnode {
 	}}
 }
 
-func translateCExpr(e expr, l labels) irnode {
+func translateCExpr(e expr, l *exprLabels) irnode {
 	return &irsNop{}
 }
 
