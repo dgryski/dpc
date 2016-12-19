@@ -4,7 +4,7 @@ import "fmt"
 
 var labelCount int
 
-func newTempLabel(l string) irnode {
+func newTempLabel(l string) *irsLabel {
 	if l == "" {
 		l = fmt.Sprintf("L%d", labelCount)
 	}
@@ -14,7 +14,7 @@ func newTempLabel(l string) irnode {
 
 var regCount int
 
-func newTempReg(r string) irnode {
+func newTempReg(r string) *ireTemp {
 	if r == "" {
 		r = fmt.Sprintf("t%d", regCount)
 	}
@@ -24,7 +24,7 @@ func newTempReg(r string) irnode {
 
 var nameCount int
 
-func newTempName(n string) irnode {
+func newTempName(n string) *ireName {
 	if n == "" {
 		n = fmt.Sprintf("LC%d", nameCount)
 	}
