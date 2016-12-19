@@ -28,5 +28,9 @@ func main() {
 
 	bind(program)
 	typecheck(program)
+
+	ir := translateProgram(program)
+
 	fmt.Println(spew.Sdump(program))
+	fmt.Println(ir)
 }
