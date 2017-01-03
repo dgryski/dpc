@@ -193,11 +193,11 @@ func translateCExpr(e expr, l *exprLabels) irnode {
 		panic("missing labels")
 	}
 
-	switch e.(type) {
+	switch ee := e.(type) {
 	case *expBinop:
-		return translateCExprBinop(e, l)
+		return translateCExprBinop(ee, l)
 	case *expUnop:
-		return translateCExprUnop(e, l)
+		return translateCExprUnop(ee, l)
 	}
 
 	exprcode := translateExpr(e)
@@ -208,12 +208,22 @@ func translateCExpr(e expr, l *exprLabels) irnode {
 	}
 }
 
-func translateCExprBinop(e expr, l *exprLabels) irnode {
+func translateCExprBinop(e *expBinop, l *exprLabels) irnode {
 	return &irsNop{}
 }
 
-func translateCExprUnop(e expr, l *exprLabels) irnode {
-	return &irsNop{}
+func translateCExprUnop(e *expUnop, l *exprLabels) irnode {
+
+	if e.op != unopNot {
+		panic("bad unop in cexpr")
+	}
+
+	ll := &exprLabels{iffalse: l.iftrue, iftrue: l.iffalse}
+
+	return &ireUnop{
+		e.op,
+		translateCExpr(e, ll),
+	}
 }
 
 func translateExpr(e expr) irnode {
@@ -337,8 +347,27 @@ func translateExprBinop(e *expBinop) irnode {
 }
 
 func translateExprUnop(e *expUnop) irnode {
-	return &irsNop{}
+
+	ee := translateExpr(e.e)
+
+	switch e.op {
+	case unopAt:
+		if emem, ok := ee.(*ireMem); ok {
+			return emem.expr
+		}
+		if elab, ok := ee.(*irsLabel); ok {
+			return elab
+		}
+		panic("bad expr type for @")
+	case unopPtr:
+		return &ireMem{ee}
+	case unopPlus, unopMinus, unopNot, unopIntToReal:
+		// TODO(dgryski): check for floating-point here
+		return &ireUnop{e.op, ee}
+	}
+	panic(fmt.Sprintf("unhandled unop: %v", e.op))
 }
+
 func translateExprId(e *expId) irnode {
 
 	varid := e.bound.(*varId)
