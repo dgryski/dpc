@@ -96,7 +96,7 @@ func typecheckExpr(e expr) {
 		e.typ = typPrimitive{primType: e.t}
 	case *expId:
 		if e.bound == nil {
-			fmt.Printf("unknown identifier %#v", e.name)
+			fmt.Printf("unknown identifier %#v\n", e.name)
 		} else {
 			e.typ = e.bound.Type()
 		}
@@ -169,7 +169,6 @@ func typecheckBinop(e *expBinop) {
 		e.typ = typPrimitive{primType: primBool}
 
 	case binArrayIndex:
-		fmt.Printf("e %+v\n", e)
 		arr, ok := e.left.Type().(typArray)
 		if !ok {
 			fmt.Printf("invalid type `%#v' for array in array index", e.left)
